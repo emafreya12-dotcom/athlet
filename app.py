@@ -807,7 +807,17 @@ FOOD_CATEGORY_GROUPS = {
         "Papaya (100 g)": 43,
         "Dates (100 g)": 282,
     },
-    "Carbohydrate & grains": FOOD_PRESETS["Carbohydrate foods"].copy(),
+    "Carbohydrate & grains": {
+        "White rice (100 g cooked)": 130,
+        "Brown rice (100 g cooked)": 123,
+        "Oats (100 g dry)": 389,
+        "Potato (100 g)": 77,
+        "Sweet potato (100 g)": 86,
+        "Pasta (100 g cooked)": 157,
+        "Whole-grain bread (1 slice)": 247,
+        "Quinoa (100 g cooked)": 120,
+        "Corn tortilla (2)": 104,
+    },
     "Plant protein": {
         "Tofu (100 g)": 76,
         "Tempeh (100 g)": 195,
@@ -829,13 +839,14 @@ FOOD_CATEGORY_GROUPS = {
         "Cheddar (100 g)": 403,
         "Mozzarella (100 g)": 280,
     },
-    "Protein": FOOD_PRESETS["High-protein foods"].copy(),
-    "Seafood & meat": {
+    "Protein": {
         "Chicken breast (100 g)": 165,
         "Turkey breast (100 g)": 135,
         "Lean beef (100 g)": 200,
         "Pork tenderloin (100 g)": 143,
         "Lamb (100 g)": 250,
+    },
+    "Seafood & meat": {
         "Salmon (100 g)": 208,
         "Tuna (100 g)": 132,
         "Cod (100 g)": 82,
@@ -2017,10 +2028,14 @@ with food_tab:
                         list(sport_food_presets),
                         key=f"preset_food_category_{username}",
                     )
+                    food_options = list(sport_food_presets[food_category])
+                    food_selection_key = f"preset_food_name_{username}"
+                    if st.session_state.get(food_selection_key) not in food_options:
+                        st.session_state[food_selection_key] = food_options[0]
                     food_name = st.selectbox(
                         "Food",
-                        list(sport_food_presets[food_category]),
-                        key=f"preset_food_name_{username}_{food_category}",
+                        food_options,
+                        key=food_selection_key,
                     )
                     calories_per_serving = sport_food_presets[food_category][food_name]
                 else:
