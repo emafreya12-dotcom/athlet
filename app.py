@@ -2029,13 +2029,9 @@ with food_tab:
                         key=f"preset_food_category_{username}",
                     )
                     food_options = list(sport_food_presets[food_category])
-                    food_selection_key = f"preset_food_name_{username}"
-                    if st.session_state.get(food_selection_key) not in food_options:
-                        st.session_state[food_selection_key] = food_options[0]
                     food_name = st.selectbox(
                         "Food",
                         food_options,
-                        key=food_selection_key,
                     )
                     calories_per_serving = sport_food_presets[food_category][food_name]
                 else:
