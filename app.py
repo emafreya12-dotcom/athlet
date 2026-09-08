@@ -146,6 +146,16 @@ st.markdown(
             background: #b91c1c;
             color: #000000;
         }
+        div[data-testid="stForm"] button[kind="secondary"] {
+            background: #ffffff;
+            color: #000000;
+            border-color: #cbd5e1;
+        }
+        div[data-testid="stForm"] button[kind="secondary"]:hover {
+            background: #f1f5f9;
+            color: #000000;
+            border-color: #94a3b8;
+        }
         .auth-page {
             max-width: 1120px;
             margin: 0 auto;
@@ -655,7 +665,7 @@ if st.session_state.current_user is None:
                 '<div class="auth-choice"><h3>Starting your journey?</h3><p>Build your athlete profile.</p></div>',
                 unsafe_allow_html=True,
             )
-            if st.button("Create profile", use_container_width=True):
+            if st.button("Create profile", type="primary", use_container_width=True):
                 st.session_state.auth_mode = "signup"
                 st.rerun()
     elif st.session_state.auth_mode == "login":
@@ -663,7 +673,7 @@ if st.session_state.current_user is None:
         with st.form("login_form"):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
-            submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
+            submitted = st.form_submit_button("Log in", type="secondary", use_container_width=True)
             if submitted:
                 if authenticate(username, password):
                     st.session_state.current_user = username.strip()
@@ -682,7 +692,7 @@ if st.session_state.current_user is None:
             new_sport = st.text_input("Sport")
             new_goal = st.text_input("Goal")
             new_target = st.number_input("Weekly target (hours)", min_value=0.0, step=0.5, value=5.0)
-            signup_submitted = st.form_submit_button("Create profile", type="primary", use_container_width=True)
+            signup_submitted = st.form_submit_button("Create profile", type="secondary", use_container_width=True)
             if signup_submitted:
                 if not new_username or not new_password:
                     st.warning("Username and password are required.")
