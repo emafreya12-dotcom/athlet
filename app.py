@@ -168,9 +168,23 @@ st.markdown(
             padding: 34px;
             border-radius: 24px;
             overflow: hidden;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.3)),
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)),
                 url("https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=85") center/cover;
             box-shadow: 0 20px 45px rgba(3, 12, 24, 0.4);
+        }
+        .login-success-flash {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            pointer-events: none;
+            background: url("https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1800&q=90") center/cover;
+            animation: champion-flash 1.6s ease-out forwards;
+        }
+        @keyframes champion-flash {
+            0% { opacity: 0; }
+            18% { opacity: 1; }
+            58% { opacity: 1; }
+            100% { opacity: 0; }
         }
         .auth-kicker {
             color: #000000;
@@ -627,6 +641,8 @@ if "current_user" not in st.session_state:
     st.session_state.current_user = None
 if "auth_mode" not in st.session_state:
     st.session_state.auth_mode = None
+if "show_success_flash" not in st.session_state:
+    st.session_state.show_success_flash = False
 
 if st.session_state.current_user is None:
     st.markdown('<div class="auth-page">', unsafe_allow_html=True)
@@ -677,10 +693,11 @@ if st.session_state.current_user is None:
             if submitted:
                 if authenticate(username, password):
                     st.session_state.current_user = username.strip()
+                    st.session_state.show_success_flash = True
                     st.rerun()
                 else:
                     st.error("Invalid username or password.")
-        if st.button("Back to choices"):
+        if st.button("Back to welcome"):
             st.session_state.auth_mode = None
             st.rerun()
     else:
@@ -707,9 +724,10 @@ if st.session_state.current_user is None:
                     st.warning("That username already exists.")
                 else:
                     st.session_state.current_user = new_username.strip()
+                    st.session_state.show_success_flash = True
                     st.success("Profile created successfully.")
                     st.rerun()
-        if st.button("Back to choices"):
+        if st.button("Back to welcome"):
             st.session_state.auth_mode = None
             st.rerun()
 
@@ -722,6 +740,10 @@ username = st.session_state.current_user
 profile = get_profile(username)
 workouts = get_workouts(username)
 food_entries = get_food_entries(username)
+
+if st.session_state.show_success_flash:
+    st.markdown('<div class="login-success-flash" aria-hidden="true"></div>', unsafe_allow_html=True)
+    st.session_state.show_success_flash = False
 
 st.markdown(
     """
