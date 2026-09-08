@@ -386,6 +386,41 @@ st.markdown(
             .auth-visual-description { display: none; }
             div[data-testid="column"]:has(.auth-form-panel) { min-height: 0; padding: 29px 24px 22px; }
         }
+        @media (max-width: 600px) {
+            .block-container {
+                width: 100%;
+                max-width: 100%;
+                padding: 0 12px 24px;
+            }
+            div[data-testid="stHorizontalBlock"] {
+                gap: 0.75rem;
+            }
+            .auth-reference-visual {
+                min-height: 330px;
+                padding: 25px 22px 22px;
+                border-radius: 0 0 14px 14px;
+            }
+            .auth-brand {
+                font-size: 16px;
+            }
+            .auth-visual-copy h1 {
+                font-size: clamp(42px, 14vw, 62px);
+            }
+            div[data-testid="column"]:has(.auth-form-panel) {
+                padding: 30px 22px 26px;
+                border-radius: 14px;
+            }
+            .auth-form-copy h2 {
+                font-size: 42px;
+            }
+            .auth-form-panel input,
+            .auth-form-panel button {
+                min-height: 50px;
+            }
+            div[data-testid="stFormSubmitButton"] button {
+                min-height: 52px;
+            }
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -394,6 +429,7 @@ st.markdown(
 DEFAULT_PROFILES = {
     "demo": {
         "username": "demo@example.com",
+        "email": "demo@example.com",
         "password": "demo123",
         "name": "Maria",
         "sport": "Swimming",
@@ -544,6 +580,7 @@ def initialize_database():
             """
             CREATE TABLE IF NOT EXISTS profiles (
                 username TEXT PRIMARY KEY,
+                email TEXT NOT NULL UNIQUE,
                 password_hash TEXT NOT NULL,
                 name TEXT NOT NULL,
                 sport TEXT NOT NULL,
@@ -576,17 +613,21 @@ def initialize_database():
         profile_columns = {
             row["name"] for row in connection.execute("PRAGMA table_info(profiles)").fetchall()
         }
+        if "email" not in profile_columns:
+            connection.execute("ALTER TABLE profiles ADD COLUMN email TEXT")
+            connection.execute("UPDATE profiles SET email = username WHERE email IS NULL OR email = ''")
         if "height" not in profile_columns:
             connection.execute("ALTER TABLE profiles ADD COLUMN height REAL NOT NULL DEFAULT 0")
         demo = DEFAULT_PROFILES["demo"]
         connection.execute(
             """
             INSERT OR IGNORE INTO profiles
-                (username, password_hash, name, sport, goal, height, weekly_target)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+                (username, email, password_hash, name, sport, goal, height, weekly_target)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 demo["username"],
+                demo["email"],
                 hash_password(demo["password"]),
                 demo["name"],
                 demo["sport"],
@@ -606,13 +647,15 @@ def get_profile(username: str):
     return dict(row) if row else None
 
 
-def authenticate(username: str, password: str) -> bool:
+def authenticate(username: str, password: str) -> str | None:
     with get_connection() as connection:
         row = connection.execute(
-            "SELECT password_hash FROM profiles WHERE username = ?",
+            "SELECT username, password_hash FROM profiles WHERE email = ?",
             (username.strip(),),
         ).fetchone()
-    return bool(row and password_matches(password, row["password_hash"]))
+    if row and password_matches(password, row["password_hash"]):
+        return row["username"]
+    return None
 
 
 def is_valid_email(email: str) -> bool:
@@ -621,6 +664,7 @@ def is_valid_email(email: str) -> bool:
 
 def create_account(
     username: str,
+    email: str,
     password: str,
     name: str,
     sport: str,
@@ -633,11 +677,12 @@ def create_account(
             connection.execute(
                 """
                 INSERT INTO profiles
-                    (username, password_hash, name, sport, goal, height, weekly_target)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (username, email, password_hash, name, sport, goal, height, weekly_target)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     username.strip(),
+                    email.strip(),
                     hash_password(password),
                     name,
                     sport,
@@ -907,12 +952,13 @@ if st.session_state.current_user is None:
                 unsafe_allow_html=True,
             )
             with st.form("login_form"):
-                username = st.text_input("Email address", placeholder="you@example.com")
+                email = st.text_input("Email address", placeholder="you@example.com")
                 password = st.text_input("Password", type="password", placeholder="Enter your password")
                 submitted = st.form_submit_button("Enter member space  →", type="secondary", use_container_width=True)
                 if submitted:
-                    if authenticate(username, password):
-                        st.session_state.current_user = username.strip()
+                    authenticated_username = authenticate(email, password)
+                    if authenticated_username:
+                        st.session_state.current_user = authenticated_username
                         st.session_state.show_success_flash = True
                         st.rerun()
                     else:
@@ -937,6 +983,7 @@ if st.session_state.current_user is None:
             st.rerun()
         st.subheader("Create your athlete profile")
         with st.form("signup_form"):
+            new_username = st.text_input("Username", placeholder="Choose a username")
             new_email = st.text_input("Email address", placeholder="you@example.com")
             new_password = st.text_input("New password", type="password")
             new_goal = st.text_input("Goal", placeholder="e.g. Complete a 10K")
@@ -944,14 +991,15 @@ if st.session_state.current_user is None:
             new_sport = st.selectbox("Sport", SPORT_OPTIONS)
             signup_submitted = st.form_submit_button("Create account", type="secondary", use_container_width=True)
             if signup_submitted:
-                if not new_email or not new_password:
-                    st.warning("Email address and password are required.")
+                if not new_username or not new_email or not new_password:
+                    st.warning("Username, email address, and password are required.")
                 elif not is_valid_email(new_email):
                     st.warning("Enter a valid email address.")
                 elif create_account(
+                    new_username,
                     new_email,
                     new_password,
-                    new_email.split("@", 1)[0],
+                    new_username,
                     new_sport,
                     new_goal or "General fitness",
                     float(new_height),
