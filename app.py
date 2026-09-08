@@ -177,13 +177,13 @@ st.markdown(
             inset: 0;
             z-index: 9999;
             pointer-events: none;
-            background: url("https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1800&q=90") center/cover;
-            animation: champion-flash 1.6s ease-out forwards;
+            background: url("https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=1800&q=90") center/cover;
+            animation: champion-flash 3s ease-out forwards;
         }
         @keyframes champion-flash {
             0% { opacity: 0; }
-            18% { opacity: 1; }
-            58% { opacity: 1; }
+            12% { opacity: 1; }
+            82% { opacity: 1; }
             100% { opacity: 0; }
         }
         .auth-kicker {
@@ -712,7 +712,7 @@ if st.session_state.current_user is None:
             new_sport = st.text_input("Sport")
             new_goal = st.text_input("Goal")
             new_target = st.number_input("Weekly target (hours)", min_value=0.0, step=0.5, value=5.0)
-            signup_submitted = st.form_submit_button("Create profile", type="secondary", use_container_width=True)
+            signup_submitted = st.form_submit_button("Create", type="secondary", use_container_width=True)
             if signup_submitted:
                 if not new_username or not new_password:
                     st.warning("Username and password are required.")
