@@ -206,6 +206,21 @@ st.markdown(
             border-radius: 12px;
             background: #fffaf0;
         }
+        .nutrition-jump-link {
+            display: inline-block;
+            margin: 8px 0 18px;
+            padding: 10px 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            color: #16724d !important;
+            background: #ffffff;
+            font-weight: 700;
+            text-decoration: none !important;
+        }
+        .nutrition-jump-link:hover {
+            background: #edf8f2;
+            border-color: #16724d;
+        }
         .stApp .st-key-food_item_form label,
         .stApp .st-key-food_item_form [data-testid="stWidgetLabel"],
         .stApp .st-key-food_item_form [data-testid="stMarkdownContainer"],
@@ -906,9 +921,9 @@ def drink_item(serving: int, calories: int, protein: float = 0.0, carbs: float =
     }
 
 
-def food_item(serving: int, calories: int, unit: str = "g") -> dict:
+def food_item(serving: int, calories: int, unit: str = "g", category: str = "Other") -> dict:
     return {
-        "category": "Other",
+        "category": category,
         "serving": serving,
         "unit": unit,
         "calories": calories,
@@ -985,7 +1000,7 @@ for food_category, food_items in {
     },
 }.items():
     for food_name, food_calories in food_items.items():
-        NUTRITION_FOODS.setdefault(food_name, food_item(100, food_calories))
+        NUTRITION_FOODS.setdefault(food_name, food_item(100, food_calories, category=food_category))
 
 
 for food_name, food_calories in {
@@ -994,7 +1009,10 @@ for food_name, food_calories in {
     "Pecel (1 serving)": 400, "Capcay (1 serving)": 225, "Soto ayam (1 bowl)": 325,
     "Rawon (1 bowl)": 500, "Urap (1 serving)": 200,
 }.items():
-    NUTRITION_FOODS.setdefault(food_name, food_item(1, food_calories, "serving"))
+    NUTRITION_FOODS.setdefault(
+        food_name,
+        food_item(1, food_calories, "serving", category="Indonesian foods"),
+    )
 
 
 NUTRITION_FOODS.update(
@@ -1762,6 +1780,11 @@ food_note_col.caption(
     "Open Nutrition to set your commitment, add meals, and calculate your daily intake."
 )
 
+st.markdown(
+    '<a class="nutrition-jump-link" href="#nutrition-section">Explore Nutrition →</a>',
+    unsafe_allow_html=True,
+)
+
 progress = min(summary["monthly_hours"] / max(profile["weekly_target"], 1), 1.0)
 st.subheader("Progress toward goal")
 st.progress(
@@ -1820,6 +1843,7 @@ with st.form("calendar_workout_form"):
             st.success(f"{planned_type} workout added for {planned_date.strftime('%d %b %Y')}.")
             st.rerun()
 
+st.markdown('<div id="nutrition-section"></div>', unsafe_allow_html=True)
 st.subheader("Science & Performance Hub")
 
 food_tab, physics_tab, chemistry_tab, biology_tab, math_tab, performance_tab = st.tabs(
@@ -2054,15 +2078,39 @@ with food_tab:
 
     if nutrition_view == "Food Database":
         st.markdown("### Food Database")
-        food_search = st.text_input("Search food", placeholder="Search chicken, rice, fruit...", key="nutrition_food_search")
-        food_category = st.selectbox("Category", ["All", *sorted({food["category"] for food in NUTRITION_FOODS.values()})], key="nutrition_database_category")
+        database_item_type = st.radio(
+            "Show list",
+            ["Food", "Drinks"],
+            horizontal=True,
+            key="nutrition_database_item_type",
+        )
+        database_items = {
+            name: details
+            for name, details in NUTRITION_FOODS.items()
+            if (details["category"] == "Drink") == (database_item_type == "Drinks")
+        }
+        database_key = database_item_type.lower()
+        food_search = st.text_input(
+            "Search food or drink",
+            placeholder="Search chicken, rice, fruit...",
+            key=f"nutrition_{database_key}_search",
+        )
+        category_options = sorted({food["category"] for food in database_items.values()})
+        food_category = st.selectbox(
+            "Category",
+            ["All", *category_options],
+            key=f"nutrition_{database_key}_category",
+        )
         matching_foods = {
             name: food
-            for name, food in NUTRITION_FOODS.items()
+            for name, food in database_items.items()
             if (not food_search or food_search.lower() in name.lower())
             and (food_category == "All" or food["category"] == food_category)
         }
         if matching_foods:
+            st.caption(
+                "Approximate values. Foods use the listed gram or serving basis; drinks use the listed milliliter serving."
+            )
             grocery_df = pd.DataFrame(
                 [
                     {
@@ -2080,16 +2128,16 @@ with food_tab:
                 use_container_width=True,
                 on_select="rerun",
                 selection_mode="single-row",
-                key="nutrition_grocery_table",
+                key=f"nutrition_{database_key}_grocery_table",
             )
             selected_rows = grocery_selection.selection.rows
             selected_food_names = list(matching_foods)
             selected_food_index = selected_rows[0] if selected_rows else 0
             selected_food_name = st.selectbox(
-                "Choose a food or drink",
+                f"Choose a {database_item_type.lower()[:-1] if database_item_type == 'Drinks' else 'food'}",
                 selected_food_names,
                 index=selected_food_index,
-                key="nutrition_selected_food",
+                key=f"nutrition_{database_key}_selected_food",
             )
             selected_food = matching_foods[selected_food_name]
             serving_amount = st.number_input(
@@ -2097,7 +2145,7 @@ with food_tab:
                 min_value=1.0,
                 value=float(selected_food["serving"]),
                 step=10.0,
-                key="nutrition_serving_amount",
+                key=f"nutrition_{database_key}_serving_amount",
             )
             serving_multiplier = serving_amount / selected_food["serving"]
             food_detail_cols = st.columns(4)
