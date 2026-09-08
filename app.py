@@ -685,6 +685,9 @@ if st.session_state.current_user is None:
                 st.session_state.auth_mode = "signup"
                 st.rerun()
     elif st.session_state.auth_mode == "login":
+        if st.button("← Back to welcome", key="login_back", type="secondary"):
+            st.session_state.auth_mode = None
+            st.rerun()
         st.subheader("Log in to your training space")
         with st.form("login_form"):
             username = st.text_input("Username")
@@ -697,10 +700,10 @@ if st.session_state.current_user is None:
                     st.rerun()
                 else:
                     st.error("Invalid username or password.")
-        if st.button("Back to welcome"):
+    else:
+        if st.button("← Back to welcome", key="signup_back", type="secondary"):
             st.session_state.auth_mode = None
             st.rerun()
-    else:
         st.subheader("Create your athlete profile")
         with st.form("signup_form"):
             new_username = st.text_input("New username")
@@ -727,9 +730,6 @@ if st.session_state.current_user is None:
                     st.session_state.show_success_flash = True
                     st.success("Profile created successfully.")
                     st.rerun()
-        if st.button("Back to welcome"):
-            st.session_state.auth_mode = None
-            st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
