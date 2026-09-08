@@ -10,6 +10,8 @@ from statistics import mean
 import pandas as pd
 import streamlit as st
 
+st.set_page_config(page_title="Athlet Dashboard", page_icon="🏃", layout="wide")
+
 st.markdown(
     """
     <style>
@@ -156,22 +158,6 @@ st.markdown(
             color: #000000;
             border-color: #94a3b8;
         }
-        .auth-page {
-            max-width: 1120px;
-            margin: 0 auto;
-        }
-        .auth-hero {
-            min-height: 360px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 34px;
-            border-radius: 24px;
-            overflow: hidden;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.55)),
-                url("https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=85") center/cover;
-            box-shadow: 0 20px 45px rgba(3, 12, 24, 0.4);
-        }
         .login-success-flash {
             position: fixed;
             inset: 0;
@@ -186,44 +172,218 @@ st.markdown(
             82% { opacity: 1; }
             100% { opacity: 0; }
         }
-        .auth-kicker {
-            color: #000000;
-            font-size: 0.82rem;
-            font-weight: 800;
-            letter-spacing: 0.14em;
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+        .stApp {
+            --auth-ink: #1d2927;
+            --auth-muted: #78827d;
+            --auth-line: #dce3dc;
+            --auth-cream: #f6f8f3;
+            --auth-white: #ffffff;
+            --auth-leaf: #3b7558;
+            --auth-leaf-dark: #2f513f;
+            --auth-lime: #d4ec9c;
+            --auth-orange: #ee9062;
+            background: var(--auth-cream);
+            font-family: "DM Sans", sans-serif;
+        }
+        .auth-reference-grid {
+            min-height: calc(100vh - 3rem);
+        }
+        .auth-reference-visual {
+            position: relative;
+            min-height: 700px;
+            overflow: hidden;
+            padding: 42px 8.2vw 35px 5vw;
+            color: #f3f6ed;
+            background: linear-gradient(135deg, rgba(25, 60, 43, .82), rgba(25, 60, 43, .2)),
+                url("https://images.unsplash.com/photo-1538805060514-97d9cc17730c?auto=format&fit=crop&w=1400&q=85") center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .auth-reference-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(13, 42, 30, .2), rgba(13, 42, 30, .18) 52%, rgba(13, 42, 30, .75));
+            pointer-events: none;
+        }
+        .auth-reference-visual > * {
+            position: relative;
+            z-index: 1;
+        }
+        .auth-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -.04em;
+        }
+        .auth-brand span:last-child span {
+            color: var(--auth-lime);
+        }
+        .auth-brand-mark {
+            display: inline-flex;
+            align-items: end;
+            gap: 3px;
+            width: 25px;
+            height: 22px;
+            transform: skew(-18deg);
+        }
+        .auth-brand-mark span {
+            display: block;
+            width: 5px;
+            border-radius: 4px 4px 1px 1px;
+            background: var(--auth-lime);
+        }
+        .auth-brand-mark span:nth-child(1) { height: 12px; opacity: .65; }
+        .auth-brand-mark span:nth-child(2) { height: 19px; }
+        .auth-brand-mark span:nth-child(3) { height: 15px; opacity: .8; }
+        .auth-visual-copy {
+            max-width: 420px;
+            margin: auto 0 13vh;
+        }
+        .auth-eyebrow {
+            margin: 0 0 17px;
+            color: var(--auth-lime);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .16em;
             text-transform: uppercase;
         }
-        .auth-title {
-            max-width: 620px;
-            margin: 8px 0;
-            color: #000000;
-            font-size: clamp(2.2rem, 5vw, 4.6rem);
-            line-height: 0.98;
-            font-weight: 850;
-        }
-        .auth-copy {
-            max-width: 520px;
+        .auth-visual-copy h1,
+        .auth-form-copy h2 {
             margin: 0;
-            color: #000000;
-            font-size: 1.05rem;
+            font-family: "Space Grotesk", sans-serif;
+            letter-spacing: -.075em;
+            line-height: .96;
         }
-        .auth-choice {
-            padding: 20px 22px 8px;
-            text-align: center;
+        .auth-visual-copy h1 {
+            color: #f3f6ed;
+            font-size: clamp(48px, 5.5vw, 78px);
+            font-weight: 600;
         }
-        .auth-choice h3 {
-            margin-bottom: 4px;
-            color: #000000;
+        .auth-visual-copy h1 em {
+            color: var(--auth-lime);
+            font-weight: 500;
         }
-        .auth-choice p {
-            color: #000000;
-            margin-bottom: 0;
+        .auth-visual-description {
+            max-width: 305px;
+            margin: 28px 0 0;
+            color: rgba(243, 246, 237, .78);
+            font-size: 14px;
+            line-height: 1.65;
         }
-        @media (max-width: 700px) {
-            .auth-hero {
-                min-height: 410px;
-                padding: 24px;
-            }
+        .auth-visual-footer {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+            color: rgba(243, 246, 237, .66);
+            font-size: 10px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .auth-progress-track {
+            width: 70px;
+            height: 2px;
+            background: rgba(255,255,255,.35);
+        }
+        .auth-progress-track span {
+            display: block;
+            width: 34%;
+            height: 100%;
+            background: var(--auth-lime);
+        }
+        div[data-testid="column"]:has(.auth-form-panel) {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 50px 8vw 30px;
+            background: var(--auth-cream);
+        }
+        .auth-form-wrap {
+            width: min(100%, 390px);
+            margin: auto;
+        }
+        .auth-form-copy h2 {
+            color: var(--auth-ink);
+            font-size: clamp(38px, 4vw, 52px);
+            font-weight: 600;
+        }
+        .auth-form-copy > p:last-child {
+            margin: 17px 0 38px;
+            color: var(--auth-muted);
+            font-size: 14px;
+        }
+        .auth-form-panel div[data-testid="stForm"] {
+            padding: 0;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+        .auth-form-panel div[data-testid="stTextInput"] label {
+            display: block;
+            margin: 0 0 9px;
+            color: #4e5a54;
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .auth-form-panel div[data-testid="stTextInput"] input {
+            min-height: 48px;
+            border: 1px solid var(--auth-line);
+            border-radius: 4px;
+            color: var(--auth-ink);
+            background: var(--auth-white);
+            font-size: 13px;
+        }
+        .auth-form-panel div[data-testid="stTextInput"] input:focus {
+            border-color: var(--auth-leaf);
+            box-shadow: 0 0 0 3px rgba(59,117,88,.1);
+        }
+        .auth-form-panel div[data-testid="stFormSubmitButton"] button {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 50px;
+            margin-top: 23px;
+            padding: 16px 18px;
+            border: 0;
+            border-radius: 3px;
+            color: #ffffff;
+            background: var(--auth-leaf-dark);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .auth-form-panel div[data-testid="stFormSubmitButton"] button:hover {
+            color: #ffffff;
+            background: var(--auth-leaf);
+        }
+        .auth-form-panel > div[data-testid="stButton"] button {
+            margin-top: 23px;
+            padding: 0;
+            border: 0;
+            color: var(--auth-muted);
+            background: transparent;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .auth-form-panel > div[data-testid="stButton"] button:hover {
+            color: var(--auth-leaf-dark);
+            text-decoration: underline;
+        }
+        @media (max-width: 850px) {
+            .auth-reference-grid { min-height: auto; }
+            .auth-reference-visual { min-height: 365px; padding: 28px 8vw 23px; }
+            div[data-testid="column"]:has(.auth-form-panel) { min-height: 600px; padding: 42px 8vw 26px; }
+        }
+        @media (max-width: 520px) {
+            .auth-reference-visual { min-height: 310px; }
+            .auth-visual-copy { margin-top: 60px; margin-bottom: 0; }
+            .auth-visual-description { display: none; }
+            div[data-testid="column"]:has(.auth-form-panel) { min-height: 0; padding: 29px 24px 22px; }
         }
     </style>
     """,
@@ -656,76 +816,81 @@ def render_calendar(year: int, month: int, workouts):
                     )
 
 
-st.set_page_config(page_title="Athlet Dashboard", page_icon="🏃", layout="wide")
-
 initialize_database()
 
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
-if "auth_mode" not in st.session_state:
-    st.session_state.auth_mode = None
+if "auth_mode" not in st.session_state or st.session_state.auth_mode in (None, "welcome"):
+    st.session_state.auth_mode = "login"
 if "show_success_flash" not in st.session_state:
     st.session_state.show_success_flash = False
 
 if st.session_state.current_user is None:
-    st.markdown('<div class="auth-page">', unsafe_allow_html=True)
-    st.markdown(
-        """
-        <div class="auth-hero">
-            <div class="auth-kicker">BioAthletic performance club</div>
-            <div class="auth-title">Run your strongest season.</div>
-            <p class="auth-copy">Track the work, protect your recovery, and turn every session into forward motion.</p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    if st.session_state.auth_mode is None:
-        st.markdown(
-            """
-            <div class="auth-choice">
-                <h3>Welcome to your training space</h3>
-                <p>Choose how you want to continue.</p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-        login_col, signup_col = st.columns(2)
-        with login_col:
+    if st.session_state.auth_mode == "login":
+        visual_col, form_col = st.columns([47, 53], gap="small")
+        with visual_col:
             st.markdown(
-                '<div class="auth-choice"><h3>Already training with us?</h3><p>Pick up where you left off.</p></div>',
+                """
+                <section class="auth-reference-visual">
+                    <header class="auth-brand">
+                        <span class="auth-brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+                        <span>Bio<span>Athletic</span></span>
+                    </header>
+                    <div class="auth-visual-copy">
+                        <p class="auth-eyebrow">Intelligence in motion</p>
+                        <h1>Train your<br><em>whole</em> self.</h1>
+                        <p class="auth-visual-description">A more considered approach to performance, recovery, and the everyday rituals that move you forward.</p>
+                    </div>
+                    <div class="auth-visual-footer">
+                        <span>01 / 03</span>
+                        <div class="auth-progress-track"><span></span></div>
+                        <span>bioathletic.co</span>
+                    </div>
+                </section>
+                """,
                 unsafe_allow_html=True,
             )
-            if st.button("Log in", type="primary", use_container_width=True):
-                st.session_state.auth_mode = "login"
-                st.rerun()
-        with signup_col:
+        with form_col:
             st.markdown(
-                '<div class="auth-choice"><h3>Starting your journey?</h3><p>Build your athlete profile.</p></div>',
+                """
+                <section class="auth-form-panel">
+                    <div class="auth-form-wrap">
+                        <div class="auth-form-copy">
+                            <p class="auth-eyebrow" style="color:#3b7558;">Member portal</p>
+                            <h2>Welcome back.</h2>
+                            <p>Sign in to continue your practice.</p>
+                        </div>
+                """,
                 unsafe_allow_html=True,
             )
-            if st.button("Create profile", type="primary", use_container_width=True):
+            with st.form("login_form"):
+                username = st.text_input("Email address", placeholder="you@example.com")
+                password = st.text_input("Password", type="password", placeholder="Enter your password")
+                submitted = st.form_submit_button("Enter member space  →", type="secondary", use_container_width=True)
+                if submitted:
+                    if authenticate(username, password):
+                        st.session_state.current_user = username.strip()
+                        st.session_state.show_success_flash = True
+                        st.rerun()
+                    else:
+                        st.error("Invalid username or password.")
+            st.markdown(
+                """
+                        <p class="auth-signup-copy">New to BioAthletic?</p>
+                    </div>
+                </section>
+                """,
+                unsafe_allow_html=True,
+            )
+            if st.button("Create an account", key="login_create_account", type="secondary"):
                 st.session_state.auth_mode = "signup"
                 st.rerun()
-    elif st.session_state.auth_mode == "login":
-        if st.button("← Back to welcome", key="login_back", type="secondary"):
-            st.session_state.auth_mode = None
-            st.rerun()
-        st.subheader("Log in to your training space")
-        with st.form("login_form"):
-            username = st.text_input("Username")
-            password = st.text_input("Password", type="password")
-            submitted = st.form_submit_button("Log in", type="secondary", use_container_width=True)
-            if submitted:
-                if authenticate(username, password):
-                    st.session_state.current_user = username.strip()
-                    st.session_state.show_success_flash = True
-                    st.rerun()
-                else:
-                    st.error("Invalid username or password.")
+            if st.button("← Return to sign in", key="login_back", type="secondary"):
+                st.session_state.auth_mode = "login"
+                st.rerun()
     else:
         if st.button("← Back to welcome", key="signup_back", type="secondary"):
-            st.session_state.auth_mode = None
+            st.session_state.auth_mode = "login"
             st.rerun()
         st.subheader("Create your athlete profile")
         with st.form("signup_form"):
@@ -753,8 +918,6 @@ if st.session_state.current_user is None:
                     st.session_state.show_success_flash = True
                     st.success("Profile created successfully.")
                     st.rerun()
-
-    st.markdown("</div>", unsafe_allow_html=True)
 
     st.stop()
 
@@ -956,8 +1119,8 @@ with st.form("calendar_workout_form"):
 
 st.subheader("Science & Performance Hub")
 
-physics_tab, chemistry_tab, biology_tab, math_tab, food_tab = st.tabs(
-    ["⚡ Physics", "💧 Chemistry", "🫀 Biology", "📐 Math", "🍽️ Makanan"]
+physics_tab, chemistry_tab, biology_tab, math_tab, performance_tab, food_tab = st.tabs(
+    ["⚡ Physics", "💧 Chemistry", "🫀 Biology", "📐 Math", "🏅 Performance", "🍽️ Makanan"]
 )
 
 with physics_tab:
@@ -1104,6 +1267,45 @@ with math_tab:
             render_assessment("Low pace efficiency", "Focus on endurance pacing, cadence work, and progressive tempo sessions.")
         else:
             render_assessment("Solid pace output", "Keep increasing volume with controlled intensity.", good=True)
+
+with performance_tab:
+    st.markdown("### Performance math calculator")
+    st.caption("Use recent results to estimate pace, target times, and training progression.")
+    performance_col1, performance_col2 = st.columns(2)
+    with performance_col1:
+        recent_distance = st.number_input("Recent distance (km)", min_value=0.4, value=5.0, key="performance_distance")
+        recent_time = st.number_input("Recent time (minutes)", min_value=1.0, value=30.0, key="performance_time")
+        target_distance = st.number_input("Target distance (km)", min_value=0.4, value=10.0, key="performance_target_distance")
+    with performance_col2:
+        weekly_load_now = st.number_input("Current weekly load (minutes)", min_value=0, value=180, key="performance_load_now")
+        weekly_load_previous = st.number_input("Previous weekly load (minutes)", min_value=0, value=160, key="performance_load_previous")
+        goal_time = st.number_input("Goal time (minutes)", min_value=1.0, value=55.0, key="performance_goal_time")
+
+    recent_pace = recent_time / recent_distance
+    riegel_time = recent_time * (target_distance / recent_distance) ** 1.06
+    pace_gap = max(0.0, riegel_time - goal_time)
+    load_change = 0.0 if weekly_load_previous == 0 else (weekly_load_now - weekly_load_previous) / weekly_load_previous * 100
+    st.metric("Current pace", f"{recent_pace:.2f} min/km")
+    st.metric("Estimated target time", f"{riegel_time:.1f} min")
+    st.metric("Goal pace gap", f"{pace_gap:.1f} min")
+    st.metric("Weekly load change", f"{load_change:+.1f}%")
+    st.caption("Target estimate uses the Riegel prediction: new time = recent time × (new distance / recent distance)^1.06.")
+    if load_change > 20:
+        render_assessment(
+            "Training-load spike",
+            "Your weekly load increased by more than 20%. Consider adding recovery before increasing intensity again.",
+        )
+    elif pace_gap <= 0:
+        render_assessment(
+            "Goal pace is within reach",
+            "Your estimated target time meets or beats the goal. Keep building consistency and protect recovery.",
+            good=True,
+        )
+    else:
+        render_assessment(
+            "Progressive target",
+            f"You are approximately {pace_gap:.1f} minutes from the goal at this distance. Use controlled tempo sessions to close the gap.",
+        )
 
 with food_tab:
     st.markdown("### Daily nutrition planner")
