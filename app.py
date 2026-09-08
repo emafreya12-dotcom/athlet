@@ -114,6 +114,61 @@ st.markdown(
         .sidebar-content {
             background: rgba(7, 16, 28, 0.65);
         }
+        .auth-page {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+        .auth-hero {
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 34px;
+            border-radius: 24px;
+            overflow: hidden;
+            background: linear-gradient(90deg, rgba(4, 18, 33, 0.9), rgba(4, 18, 33, 0.18)),
+                url("https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1600&q=85") center/cover;
+            box-shadow: 0 20px 45px rgba(3, 12, 24, 0.4);
+        }
+        .auth-kicker {
+            color: #7ce5c7;
+            font-size: 0.82rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+        .auth-title {
+            max-width: 620px;
+            margin: 8px 0;
+            color: #ffffff;
+            font-size: clamp(2.2rem, 5vw, 4.6rem);
+            line-height: 0.98;
+            font-weight: 850;
+        }
+        .auth-copy {
+            max-width: 520px;
+            margin: 0;
+            color: #e1f3fb;
+            font-size: 1.05rem;
+        }
+        .auth-choice {
+            padding: 20px 22px 8px;
+            text-align: center;
+        }
+        .auth-choice h3 {
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+        .auth-choice p {
+            color: #ccecff;
+            margin-bottom: 0;
+        }
+        @media (max-width: 700px) {
+            .auth-hero {
+                min-height: 410px;
+                padding: 24px;
+            }
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -528,26 +583,66 @@ initialize_database()
 
 if "current_user" not in st.session_state:
     st.session_state.current_user = None
+if "auth_mode" not in st.session_state:
+    st.session_state.auth_mode = None
 
 if st.session_state.current_user is None:
-    st.title("🏅 BioAthletic Login")
-    login_col, signup_col = st.columns(2)
+    st.markdown('<div class="auth-page">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div class="auth-hero">
+            <div class="auth-kicker">BioAthletic performance club</div>
+            <div class="auth-title">Run your strongest season.</div>
+            <p class="auth-copy">Track the work, protect your recovery, and turn every session into forward motion.</p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    with login_col:
-        st.subheader("Login")
+    if st.session_state.auth_mode is None:
+        st.markdown(
+            """
+            <div class="auth-choice">
+                <h3>Welcome to your training space</h3>
+                <p>Choose how you want to continue.</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        login_col, signup_col = st.columns(2)
+        with login_col:
+            st.markdown(
+                '<div class="auth-choice"><h3>Already training with us?</h3><p>Pick up where you left off.</p></div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("Log in", type="primary", use_container_width=True):
+                st.session_state.auth_mode = "login"
+                st.rerun()
+        with signup_col:
+            st.markdown(
+                '<div class="auth-choice"><h3>Starting your journey?</h3><p>Build your athlete profile.</p></div>',
+                unsafe_allow_html=True,
+            )
+            if st.button("Create profile", use_container_width=True):
+                st.session_state.auth_mode = "signup"
+                st.rerun()
+    elif st.session_state.auth_mode == "login":
+        st.subheader("Log in to your training space")
         with st.form("login_form"):
             username = st.text_input("Username")
             password = st.text_input("Password", type="password")
-            submitted = st.form_submit_button("Login")
+            submitted = st.form_submit_button("Log in", type="primary", use_container_width=True)
             if submitted:
                 if authenticate(username, password):
                     st.session_state.current_user = username.strip()
                     st.rerun()
                 else:
                     st.error("Invalid username or password.")
-
-    with signup_col:
-        st.subheader("Create profile")
+        if st.button("Back to choices"):
+            st.session_state.auth_mode = None
+            st.rerun()
+    else:
+        st.subheader("Create your athlete profile")
         with st.form("signup_form"):
             new_username = st.text_input("New username")
             new_password = st.text_input("New password", type="password")
@@ -555,7 +650,7 @@ if st.session_state.current_user is None:
             new_sport = st.text_input("Sport")
             new_goal = st.text_input("Goal")
             new_target = st.number_input("Weekly target (hours)", min_value=0.0, step=0.5, value=5.0)
-            signup_submitted = st.form_submit_button("Create account")
+            signup_submitted = st.form_submit_button("Create profile", type="primary", use_container_width=True)
             if signup_submitted:
                 if not new_username or not new_password:
                     st.warning("Username and password are required.")
@@ -572,6 +667,11 @@ if st.session_state.current_user is None:
                     st.session_state.current_user = new_username.strip()
                     st.success("Profile created successfully.")
                     st.rerun()
+        if st.button("Back to choices"):
+            st.session_state.auth_mode = None
+            st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
     st.stop()
 
