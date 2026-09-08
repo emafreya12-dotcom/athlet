@@ -858,14 +858,23 @@ FOOD_CATEGORY_GROUPS = {
 }
 
 NUTRITION_FOODS = {
+    "Apple": {"category": "Fruit", "serving": 100, "unit": "g", "calories": 52, "protein": 0.3, "carbs": 13.8, "fat": 0.2},
+    "Banana": {"category": "Fruit", "serving": 100, "unit": "g", "calories": 89, "protein": 1.1, "carbs": 22.8, "fat": 0.3},
     "Chicken breast": {"category": "Protein", "serving": 100, "unit": "g", "calories": 165, "protein": 31.0, "carbs": 0.0, "fat": 3.6},
+    "Chicken thigh": {"category": "Protein", "serving": 100, "unit": "g", "calories": 209, "protein": 26.0, "carbs": 0.0, "fat": 10.9},
     "White rice": {"category": "Carbohydrate & grains", "serving": 100, "unit": "g", "calories": 130, "protein": 2.7, "carbs": 28.0, "fat": 0.3},
+    "Brown rice": {"category": "Carbohydrate & grains", "serving": 100, "unit": "g", "calories": 123, "protein": 2.7, "carbs": 25.6, "fat": 1.0},
+    "Oats": {"category": "Carbohydrate & grains", "serving": 100, "unit": "g", "calories": 389, "protein": 16.9, "carbs": 66.3, "fat": 6.9},
+    "Potato": {"category": "Carbohydrate & grains", "serving": 100, "unit": "g", "calories": 77, "protein": 2.0, "carbs": 17.5, "fat": 0.1},
     "Broccoli": {"category": "Vegetables", "serving": 100, "unit": "g", "calories": 34, "protein": 2.8, "carbs": 6.6, "fat": 0.4},
     "Avocado": {"category": "Healthy fats", "serving": 100, "unit": "g", "calories": 160, "protein": 2.0, "carbs": 8.5, "fat": 14.7},
+    "Whole egg": {"category": "Eggs & dairy", "serving": 100, "unit": "g", "calories": 143, "protein": 12.6, "carbs": 0.7, "fat": 9.5},
+    "Whole milk": {"category": "Eggs & dairy", "serving": 100, "unit": "g", "calories": 61, "protein": 3.2, "carbs": 4.8, "fat": 3.3},
     "Greek yogurt": {"category": "Eggs & dairy", "serving": 100, "unit": "g", "calories": 59, "protein": 10.0, "carbs": 3.6, "fat": 0.4},
     "Salmon": {"category": "Seafood & meat", "serving": 100, "unit": "g", "calories": 208, "protein": 20.4, "carbs": 0.0, "fat": 13.4},
+    "Tuna": {"category": "Seafood & meat", "serving": 100, "unit": "g", "calories": 132, "protein": 28.0, "carbs": 0.0, "fat": 1.3},
     "Tofu": {"category": "Plant protein", "serving": 100, "unit": "g", "calories": 76, "protein": 8.0, "carbs": 1.9, "fat": 4.8},
-    "Banana": {"category": "Fruit", "serving": 100, "unit": "g", "calories": 89, "protein": 1.1, "carbs": 22.8, "fat": 0.3},
+    "Tempeh": {"category": "Plant protein", "serving": 100, "unit": "g", "calories": 195, "protein": 19.9, "carbs": 7.6, "fat": 11.4},
 }
 
 SPORT_FOOD_ADDITIONS = {
@@ -1996,77 +2005,108 @@ with food_tab:
                 unsafe_allow_html=True,
             )
             if input_mode == "Input calories myself":
-                food_column, drink_column = st.columns(2)
-                with food_column:
-                    st.markdown('<div class="food-input-card">', unsafe_allow_html=True)
-                    food_name = st.text_input("Food name", placeholder="e.g. Chicken and rice", key=f"custom_food_name_{username}")
-                    food_calories = st.number_input("Food calories (kcal)", min_value=0, max_value=3000, step=5, value=200, key=f"custom_food_calories_{username}")
-                    st.markdown('</div>', unsafe_allow_html=True)
-                with drink_column:
-                    st.markdown('<div class="food-input-card">', unsafe_allow_html=True)
-                    drink_name = st.text_input("Drink name (optional)", placeholder="e.g. Coconut water", key=f"custom_drink_name_{username}")
-                    drink_calories = st.number_input("Drink calories (kcal)", min_value=0, max_value=3000, step=5, value=0, key=f"custom_drink_calories_{username}")
-                    st.markdown('</div>', unsafe_allow_html=True)
+                food_name = st.text_input("Food or drink name", placeholder="e.g. Chicken and rice", key=f"custom_food_name_{username}")
+                calories_per_serving = st.number_input(
+                    "Calories per serving (kcal)", min_value=0, max_value=3000, step=5, value=200,
+                    key=f"custom_food_calories_{username}",
+                )
                 custom_category = st.selectbox(
-                    "Category",
-                    ["Other", "Vegetables", "Healthy fats", "Fruit", "Carbohydrate & grains", "Plant protein", "Eggs & dairy", "Protein", "Seafood & meat", "Food limit"],
+                    "Item type",
+                    ["Food", "Drink", "Other"],
                     key=f"custom_food_category_{username}",
                 )
-                food_name = food_name or drink_name
-                calories_per_serving = food_calories if food_name == st.session_state.get(f"custom_food_name_{username}", "") else drink_calories
-                st.caption("Type a food or drink in its own column. Add one item per submission.")
+                selected_item = custom_category
+                st.caption("Enter one food or drink directly, then choose the amount below.")
+                selected_macros = None
             else:
                 selected_item = st.radio(
-                    "Choose food or drink",
+                    "What do you want to add?",
                     ["Food", "Drink"],
                     horizontal=True,
                     key=f"preset_item_type_{username}",
                 )
                 if selected_item == "Food":
-                    food_category = st.selectbox(
-                        "1. Choose a food category",
-                        list(sport_food_presets),
-                        key=f"preset_food_category_{username}",
-                    )
-                    food_options = list(sport_food_presets[food_category])
-                    food_name = st.selectbox(
-                        f"2. Choose a food from {food_category}",
-                        food_options,
-                    )
-                    calories_per_serving = sport_food_presets[food_category][food_name]
+                    food_search = st.text_input(
+                        "Search individual foods",
+                        placeholder="Try chicken, rice, banana, avocado...",
+                        key=f"food_tracker_search_{username}",
+                    ).strip().lower()
+                    matching_foods = {
+                        name: details
+                        for name, details in NUTRITION_FOODS.items()
+                        if not food_search or food_search in name.lower()
+                    }
+                    if not matching_foods:
+                        st.warning("No foods match that search. Try another name.")
+                        food_name = ""
+                        calories_per_serving = 0
+                        custom_category = "Food"
+                        selected_macros = None
+                    else:
+                        food_name = st.selectbox(
+                            "Choose an individual food",
+                            list(matching_foods),
+                            key=f"food_tracker_food_{username}",
+                        )
+                        selected_food = matching_foods[food_name]
+                        calories_per_serving = selected_food["calories"]
+                        custom_category = selected_food["category"]
+                        selected_macros = selected_food
+                        st.caption(
+                            f"{food_name} · {selected_food['calories']} kcal per 100 {selected_food['unit']} · "
+                            f"{selected_food['category']}"
+                        )
                 else:
-                    drink_category = st.selectbox(
-                        "Drink category",
-                        ["Drink"],
-                        key=f"preset_drink_category_{username}",
-                    )
-                    drink_options = {
+                    drink_search = st.text_input(
+                        "Search drinks",
+                        placeholder="Try water, milk, coffee, smoothie...",
+                        key=f"drink_tracker_search_{username}",
+                    ).strip().lower()
+                    drink_library = {
                         item: calories
                         for drink_group in DRINK_PRESETS.values()
                         for item, calories in drink_group.items()
                     }
-                    drink_name = st.selectbox(
-                        "Drink",
-                        list(drink_options),
-                        key=f"preset_drink_name_{username}",
-                    )
-                    calories_per_serving = drink_options[drink_name]
-                if selected_item == "Food":
-                    custom_category = food_category
-                else:
-                    food_name = drink_name
-                    custom_category = drink_category
-                st.caption(
-                    f"Selected category: {custom_category} · {selected_item} estimate: "
-                    f"{calories_per_serving} kcal per serving for {profile['sport']}"
-                )
-            servings = st.number_input("Servings", min_value=0.25, max_value=20.0, step=0.25, value=1.0, key="food_servings")
+                    matching_drinks = {
+                        name: calories
+                        for name, calories in drink_library.items()
+                        if not drink_search or drink_search in name.lower()
+                    }
+                    if not matching_drinks:
+                        st.warning("No drinks match that search. Try another name.")
+                        food_name = ""
+                        calories_per_serving = 0
+                    else:
+                        drink_name = st.selectbox(
+                            "Choose an individual drink",
+                            list(matching_drinks),
+                            key=f"food_tracker_drink_{username}",
+                        )
+                        food_name = drink_name
+                        calories_per_serving = matching_drinks[drink_name]
+                        st.caption(f"{drink_name} · {calories_per_serving} kcal per serving · Drink")
+                    custom_category = "Drink"
+                    selected_macros = None
+
+            servings = st.number_input(
+                "Amount / servings",
+                min_value=0.25,
+                max_value=20.0,
+                step=0.25,
+                value=1.0,
+                key="food_servings",
+            )
             item_calories = round(calories_per_serving * servings)
-            st.metric("Item calories", f"{item_calories} kcal")
-            add_food_item = st.form_submit_button("＋ Add food item")
+            st.metric("Selected item calories", f"{item_calories} kcal")
+            if selected_macros:
+                macro_columns = st.columns(3)
+                macro_columns[0].metric("Protein", f"{selected_macros['protein'] * servings:.1f} g")
+                macro_columns[1].metric("Carbs", f"{selected_macros['carbs'] * servings:.1f} g")
+                macro_columns[2].metric("Fat", f"{selected_macros['fat'] * servings:.1f} g")
+            add_food_item = st.form_submit_button("＋ Add to today's food")
             if add_food_item:
                 if not food_name.strip():
-                    st.warning("Enter a food or drink name.")
+                    st.warning("Choose a food or drink before adding it.")
                 else:
                     save_food_entry(
                         username,
@@ -2078,8 +2118,9 @@ with food_tab:
                             "calories": item_calories,
                         },
                     )
+                    st.success(f"Added {food_name}: {item_calories} kcal.")
                     st.rerun()
-                    st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 
         if selected_entries:
             st.markdown("#### Today's food list")
