@@ -14,25 +14,23 @@ st.markdown(
     """
     <style>
         .stApp {
-            background: linear-gradient(135deg, #08192d 0%, #0c2740 28%, #123d5b 68%, #0e1f2e 100%);
-            color: #edf9ff;
+            background: #f5f7fa;
+            color: #172033;
         }
         .block-container {
             padding-top: 1.5rem;
             padding-bottom: 2rem;
         }
         h1, h2, h3, h4 {
-            color: #f6fbff;
+            color: #172033;
         }
         .main-header {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 18px;
+            background: #ffffff;
+            border: 1px solid #e3e8ef;
+            border-radius: 12px;
             padding: 18px 20px;
             margin-bottom: 18px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(8, 18, 34, 0.35);
+            box-shadow: 0 8px 24px rgba(23, 32, 51, 0.06);
         }
         .brand {
             display: flex;
@@ -41,7 +39,7 @@ st.markdown(
             font-size: 2rem;
             font-weight: 800;
             letter-spacing: 0.02em;
-            color: #dff7ff;
+            color: #172033;
         }
         .brand-mark {
             display: inline-flex;
@@ -50,69 +48,68 @@ st.markdown(
             width: 48px;
             height: 48px;
             border-radius: 14px;
-            background: linear-gradient(135deg, #3dd9b2, #4bb7ff);
-            color: #032133;
+            background: #d9f5e8;
+            color: #16724d;
             font-size: 1.5rem;
-            box-shadow: 0 8px 20px rgba(61, 217, 178, 0.45);
+            box-shadow: none;
         }
         .stMetric, [data-testid="stMetricValue"] {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #e3e8ef;
+            border-radius: 12px;
             padding: 14px 16px;
-            box-shadow: 0 10px 25px rgba(7, 17, 28, 0.25);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 6px 18px rgba(23, 32, 51, 0.05);
         }
         .stMetric [data-testid="stMetricLabel"] {
-            color: #ccecff;
+            color: #657086;
             font-weight: 600;
         }
         .stMetric [data-testid="stMetricValue"] {
-            color: #86f7c8;
+            color: #16724d;
             font-weight: 800;
         }
         .stDataFrame {
-            background: rgba(255,255,255,0.05);
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.08);
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e3e8ef;
         }
         div[data-testid="stForm"] {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
+            background: #ffffff;
+            border: 1px solid #e3e8ef;
+            border-radius: 12px;
             padding: 12px;
+            box-shadow: 0 6px 18px rgba(23, 32, 51, 0.05);
         }
         .stProgress > div > div {
-            background: linear-gradient(90deg, #46d0b2 0%, #77d7ff 100%);
+            background: #2fa66f;
         }
         .stAlert {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: #ffffff;
+            border: 1px solid #e3e8ef;
         }
         .stTabs [role="tablist"] {
             gap: 8px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 16px;
+            background: #ffffff;
+            border: 1px solid #e3e8ef;
+            border-radius: 12px;
             padding: 8px;
         }
         .stTabs [role="tab"] {
             min-height: 54px;
-            border-radius: 11px;
-            color: #ccecff;
+            border-radius: 8px;
+            color: #657086;
             font-weight: 700;
         }
         .stTabs [role="tab"]:hover {
-            background: rgba(124,229,199,0.12);
-            color: #ffffff;
+            background: #edf8f2;
+            color: #16724d;
         }
         .stTabs [aria-selected="true"] {
-            background: linear-gradient(135deg, rgba(61,217,178,0.28), rgba(75,183,255,0.22));
-            color: #ffffff;
+            background: #d9f5e8;
+            color: #16724d;
         }
         .sidebar-content {
-            background: rgba(7, 16, 28, 0.65);
+            background: #ffffff;
         }
         .auth-page {
             max-width: 1120px;
