@@ -591,14 +591,20 @@ SPORT_OPTIONS = [
     "Run",
     "Bycling",
     "Basketball",
-    "swimming",
-    "football",
-    "badminton",
-    "weight lifting",
-    "hocky",
-    "yoga",
-    "pilates",
+    "Swimming",
+    "Football",
+    "Badminton",
+    "Weight Lifting",
+    "Hocky",
+    "Yoga",
+    "Pilates",
 ]
+SPORT_LABELS = {sport.lower(): sport for sport in SPORT_OPTIONS}
+
+
+def format_sport_name(sport: str) -> str:
+    normalized_sport = sport.strip().lower()
+    return SPORT_LABELS.get(normalized_sport, sport.strip().title())
 
 SPORT_PHOTOS = {
     "volly": "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=600&q=85",
@@ -1634,7 +1640,12 @@ if st.session_state.current_user is None:
             new_password = st.text_input("New password", type="password")
             new_goal = st.text_input("Goal", placeholder="e.g. Complete a 10K")
             new_height = st.number_input("Height (cm)", min_value=50.0, max_value=250.0, value=170.0, step=1.0)
-            new_sport = st.selectbox("Sport", SPORT_OPTIONS)
+            new_sport = st.selectbox(
+                "Sport",
+                [format_sport_name(sport) for sport in SPORT_OPTIONS],
+                format_func=format_sport_name,
+                key="registration_sport_selector_v2",
+            )
             signup_submitted = st.form_submit_button("Create account", type="secondary", use_container_width=True)
             if signup_submitted:
                 if not new_username or not new_email or not new_password:
@@ -1674,6 +1685,7 @@ profile_photo = SPORT_PHOTOS.get(
     profile["sport"].strip().lower(),
     "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400&q=80",
 )
+display_sport = format_sport_name(profile["sport"])
 
 if st.session_state.show_success_flash:
     st.markdown(
@@ -1699,8 +1711,16 @@ with st.sidebar:
     st.header("Profile management")
     with st.form("athlete_form"):
         updated_name = st.text_input("Name", value=profile["name"])
-        sport_options = SPORT_OPTIONS if profile["sport"] in SPORT_OPTIONS else [profile["sport"], *SPORT_OPTIONS]
-        updated_sport = st.selectbox("Sport", sport_options, index=sport_options.index(profile["sport"]))
+        sport_options = [format_sport_name(sport) for sport in SPORT_OPTIONS]
+        if display_sport not in sport_options:
+            sport_options.insert(0, display_sport)
+        updated_sport = st.selectbox(
+            "Sport",
+            sport_options,
+            index=sport_options.index(display_sport),
+            format_func=format_sport_name,
+            key="profile_sport_selector_v3",
+        )
         updated_goal = st.text_input("Goal", value=profile["goal"])
         updated_height = st.number_input(
             "Height (cm)", min_value=50.0, max_value=250.0, step=1.0, value=float(profile["height"] or 170.0)
@@ -1756,7 +1776,7 @@ with profile_col:
                 </div>
             </div>
         </div>
-        """.format(profile_photo, profile["name"], profile["sport"], profile["goal"], profile["height"]),
+        """.format(profile_photo, profile["name"], display_sport, profile["goal"], profile["height"]),
         unsafe_allow_html=True,
     )
 
@@ -1781,7 +1801,7 @@ with leaderboard_col:
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Athlete", profile["name"])
-col2.metric("Sport", profile["sport"])
+col2.metric("Sport", display_sport)
 col3.metric("Goal", profile["goal"])
 col4.metric("Height", f"{profile['height']} cm")
 
@@ -1866,11 +1886,11 @@ food_tab, physics_tab, chemistry_tab, biology_tab, math_tab, performance_tab = s
     ["🥗 Nutrition", "⚡ Physics", "💧 Chemistry", "🫀 Biology", "📐 Math", "🏅 Performance"]
 )
 
-sport_name = profile["sport"]
+sport_name = display_sport
 sport_key = sport_name.strip().lower()
 
 with physics_tab:
-    st.markdown(f"### {sport_name} physics")
+    st.markdown(f"### {sport_name} Physics")
     st.caption("This calculator is selected automatically from your registered sport.")
     mass_kg = st.number_input("Body mass (kg)", min_value=1.0, value=70.0, key="physics_mass")
     if sport_key == "volly":
@@ -1905,7 +1925,7 @@ with physics_tab:
     )
 
 with chemistry_tab:
-    st.markdown(f"### {sport_name} chemistry")
+    st.markdown(f"### {sport_name} Chemistry")
     st.caption("Measure your own sweat loss instead of guessing it.")
     st.info(
         "How to measure: weigh yourself before and after training in similar clothing, record every drink, "
@@ -1929,7 +1949,7 @@ with chemistry_tab:
     render_assessment("Session chemistry ready", f"Plan fluids and electrolytes around your {sport_name} session.", good=True)
 
 with biology_tab:
-    st.markdown(f"### {sport_name} biology")
+    st.markdown(f"### {sport_name} Biology")
     st.caption("Estimate sport-session energy use and heart-rate training zones.")
     age = st.number_input("Age", min_value=10, value=28, key="bio_age")
     weight_kg = st.number_input("Weight (kg)", min_value=20.0, value=70.0, key="bio_weight")
@@ -1948,7 +1968,7 @@ with biology_tab:
     render_assessment("Sport energy estimate ready", f"Use the {sport_name} estimate with your actual session duration and effort.", good=True)
 
 with math_tab:
-    st.markdown(f"### {sport_name} math")
+    st.markdown(f"### {sport_name} Math")
     st.caption("Your registered sport selects the performance calculation automatically.")
     if sport_key == "football":
         passes_attempted = st.number_input("Passes attempted", min_value=1, value=40, key="math_passes_attempted")
@@ -2064,7 +2084,7 @@ with food_tab:
     st.markdown("## 🥗 Nutrition")
     st.caption("Fuel your body based on your sport, training, and goals.")
     context_col1, context_col2, context_col3 = st.columns(3)
-    context_col1.metric("Your sport", profile["sport"])
+    context_col1.metric("Your sport", display_sport)
     context_col2.metric("Your goal", profile["goal"])
     context_col3.metric("Today's nutrition", f"{nutrition_totals_today['calories']:,.0f} / {calorie_target:,} kcal")
 
@@ -2456,6 +2476,7 @@ workout_df = pd.DataFrame(workouts)
 if not workout_df.empty:
     workout_df = workout_df.sort_values("date", ascending=False)
     workout_df["date"] = pd.to_datetime(workout_df["date"]).dt.strftime("%Y-%m-%d")
+    workout_df["sport"] = workout_df["sport"].map(format_sport_name)
     st.dataframe(workout_df[["date", "name", "type", "duration", "sport"]], use_container_width=True)
 else:
     st.info("No workouts logged yet.")
