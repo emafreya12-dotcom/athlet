@@ -1007,7 +1007,7 @@ if st.session_state.current_user is None:
                 ) is False:
                     st.warning("That email address is already registered.")
                 else:
-                    st.session_state.current_user = new_email.strip()
+                    st.session_state.current_user = new_username.strip()
                     st.session_state.show_success_flash = True
                     st.success("Profile created successfully.")
                     st.rerun()
@@ -1017,6 +1017,11 @@ if st.session_state.current_user is None:
 
 username = st.session_state.current_user
 profile = get_profile(username)
+if profile is None:
+    st.session_state.current_user = None
+    st.session_state.auth_mode = "login"
+    st.error("We could not load your profile. Please sign in again.")
+    st.stop()
 workouts = get_workouts(username)
 food_entries = get_food_entries(username)
 
