@@ -398,9 +398,24 @@ DEFAULT_PROFILES = {
         "name": "Maria",
         "sport": "Swimming",
         "goal": "Open Water Race",
+        "height": 165.0,
         "weekly_target": 12.5,
     }
 }
+
+SPORT_OPTIONS = [
+    "Volly",
+    "Run",
+    "Bycling",
+    "Basketball",
+    "swimming",
+    "football",
+    "badminton",
+    "weight lifting",
+    "hocky",
+    "yoga",
+    "pilates",
+]
 
 DATABASE_PATH = "bioathletic.db"
 
@@ -533,6 +548,7 @@ def initialize_database():
                 name TEXT NOT NULL,
                 sport TEXT NOT NULL,
                 goal TEXT NOT NULL,
+                height REAL NOT NULL DEFAULT 0,
                 weekly_target REAL NOT NULL
             );
             CREATE TABLE IF NOT EXISTS workouts (
@@ -557,12 +573,17 @@ def initialize_database():
             );
             """
         )
+        profile_columns = {
+            row["name"] for row in connection.execute("PRAGMA table_info(profiles)").fetchall()
+        }
+        if "height" not in profile_columns:
+            connection.execute("ALTER TABLE profiles ADD COLUMN height REAL NOT NULL DEFAULT 0")
         demo = DEFAULT_PROFILES["demo"]
         connection.execute(
             """
             INSERT OR IGNORE INTO profiles
-                (username, password_hash, name, sport, goal, weekly_target)
-            VALUES (?, ?, ?, ?, ?, ?)
+                (username, password_hash, name, sport, goal, height, weekly_target)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 demo["username"],
@@ -570,6 +591,7 @@ def initialize_database():
                 demo["name"],
                 demo["sport"],
                 demo["goal"],
+                demo["height"],
                 demo["weekly_target"],
             ),
         )
@@ -578,7 +600,7 @@ def initialize_database():
 def get_profile(username: str):
     with get_connection() as connection:
         row = connection.execute(
-            "SELECT username, name, sport, goal, weekly_target FROM profiles WHERE username = ?",
+            "SELECT username, name, sport, goal, height, weekly_target FROM profiles WHERE username = ?",
             (username,),
         ).fetchone()
     return dict(row) if row else None
@@ -597,14 +619,22 @@ def is_valid_email(email: str) -> bool:
     return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email.strip()))
 
 
-def create_account(username: str, password: str, name: str, sport: str, goal: str, weekly_target: float):
+def create_account(
+    username: str,
+    password: str,
+    name: str,
+    sport: str,
+    goal: str,
+    height: float,
+    weekly_target: float,
+):
     try:
         with get_connection() as connection:
             connection.execute(
                 """
                 INSERT INTO profiles
-                    (username, password_hash, name, sport, goal, weekly_target)
-                VALUES (?, ?, ?, ?, ?, ?)
+                    (username, password_hash, name, sport, goal, height, weekly_target)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     username.strip(),
@@ -612,6 +642,7 @@ def create_account(username: str, password: str, name: str, sport: str, goal: st
                     name,
                     sport,
                     goal,
+                    height,
                     weekly_target,
                 ),
             )
@@ -625,10 +656,17 @@ def save_profile(username: str, profile: dict):
         connection.execute(
             """
             UPDATE profiles
-            SET name = ?, sport = ?, goal = ?, weekly_target = ?
+            SET name = ?, sport = ?, goal = ?, height = ?, weekly_target = ?
             WHERE username = ?
             """,
-            (profile["name"], profile["sport"], profile["goal"], profile["weekly_target"], username),
+            (
+                profile["name"],
+                profile["sport"],
+                profile["goal"],
+                profile["height"],
+                profile["weekly_target"],
+                username,
+            ),
         )
 
 
@@ -901,6 +939,9 @@ if st.session_state.current_user is None:
         with st.form("signup_form"):
             new_email = st.text_input("Email address", placeholder="you@example.com")
             new_password = st.text_input("New password", type="password")
+            new_goal = st.text_input("Goal", placeholder="e.g. Complete a 10K")
+            new_height = st.number_input("Height (cm)", min_value=50.0, max_value=250.0, value=170.0, step=1.0)
+            new_sport = st.selectbox("Sport", SPORT_OPTIONS)
             signup_submitted = st.form_submit_button("Create account", type="secondary", use_container_width=True)
             if signup_submitted:
                 if not new_email or not new_password:
@@ -911,8 +952,9 @@ if st.session_state.current_user is None:
                     new_email,
                     new_password,
                     new_email.split("@", 1)[0],
-                    "General fitness",
-                    "General fitness",
+                    new_sport,
+                    new_goal or "General fitness",
+                    float(new_height),
                     5.0,
                 ) is False:
                     st.warning("That email address is already registered.")
@@ -951,8 +993,12 @@ with st.sidebar:
     st.header("Profile management")
     with st.form("athlete_form"):
         updated_name = st.text_input("Name", value=profile["name"])
-        updated_sport = st.text_input("Sport", value=profile["sport"])
+        sport_options = SPORT_OPTIONS if profile["sport"] in SPORT_OPTIONS else [profile["sport"], *SPORT_OPTIONS]
+        updated_sport = st.selectbox("Sport", sport_options, index=sport_options.index(profile["sport"]))
         updated_goal = st.text_input("Goal", value=profile["goal"])
+        updated_height = st.number_input(
+            "Height (cm)", min_value=50.0, max_value=250.0, step=1.0, value=float(profile["height"] or 170.0)
+        )
         updated_target = st.number_input(
             "Weekly target (hours)", min_value=0.0, step=0.5, value=float(profile["weekly_target"])
         )
@@ -963,6 +1009,7 @@ with st.sidebar:
                     "name": updated_name,
                     "sport": updated_sport,
                     "goal": updated_goal,
+                    "height": float(updated_height),
                     "weekly_target": float(updated_target),
                 }
             )
@@ -1020,10 +1067,11 @@ with profile_col:
                     <div style="font-size: 1.2rem; font-weight: 700;">{}</div>
                     <div style="color: #000000;">{}</div>
                     <div style="color: #16724d; font-weight: 600; margin-top: 6px;">Goal: {}</div>
+                    <div style="color: #52605a; margin-top: 4px;">Height: {} cm</div>
                 </div>
             </div>
         </div>
-        """.format(profile_photo, profile["name"], profile["sport"], profile["goal"]),
+        """.format(profile_photo, profile["name"], profile["sport"], profile["goal"], profile["height"]),
         unsafe_allow_html=True,
     )
 
@@ -1046,15 +1094,16 @@ with leaderboard_col:
     )
     st.dataframe(team_df, hide_index=True, use_container_width=True)
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 col1.metric("Athlete", profile["name"])
 col2.metric("Sport", profile["sport"])
 col3.metric("Goal", profile["goal"])
+col4.metric("Height", f"{profile['height']} cm")
 
-col4, col5, col6 = st.columns(3)
-col4.metric("Total sessions", summary["total_sessions"])
-col5.metric("This month", f"{summary['monthly_hours']} h")
-col6.metric("Weekly target", f"{profile['weekly_target']} h")
+col5, col6, col7 = st.columns(3)
+col5.metric("Total sessions", summary["total_sessions"])
+col6.metric("This month", f"{summary['monthly_hours']} h")
+col7.metric("Weekly target", f"{profile['weekly_target']} h")
 
 food_metric_col, food_note_col = st.columns([1, 2])
 food_metric_col.metric("Today's calories", f"{today_calories:,} kcal")
