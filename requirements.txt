@@ -1,1 +1,2 @@
-# No external dependencies required for the starter project.
+streamlit>=1.36,<2
+pandas>=2.0,<3
