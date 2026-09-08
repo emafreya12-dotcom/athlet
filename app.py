@@ -1,4 +1,5 @@
 import calendar
+from html import escape
 import hashlib
 import hmac
 import math
@@ -94,6 +95,30 @@ st.markdown(
         .stAlert {
             background: #ffffff;
             border: 1px solid #e3e8ef;
+        }
+        .nutrition-commitment-card {
+            margin: 12px 0 20px;
+            padding: 18px 20px;
+            border: 1px solid #b9d9bd;
+            border-left: 5px solid #3b7558;
+            border-radius: 10px;
+            background: #edf8ee;
+            color: #1d2927;
+            box-shadow: 0 6px 18px rgba(59, 117, 88, 0.1);
+        }
+        .nutrition-commitment-label {
+            margin-bottom: 7px;
+            color: #2f513f;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+        .nutrition-commitment-text {
+            color: #1d2927;
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.55;
         }
         .stTabs [role="tablist"] {
             gap: 8px;
@@ -1426,7 +1451,16 @@ with food_tab:
                     st.rerun()
                 st.warning("Write a commitment before opening the food calculator.")
     else:
-        st.success(f"Commitment: {st.session_state[commitment_key]}")
+        commitment_text = escape(st.session_state[commitment_key])
+        st.markdown(
+            f"""
+            <div class="nutrition-commitment-card">
+                <div class="nutrition-commitment-label">Nutrition commitment</div>
+                <div class="nutrition-commitment-text">{commitment_text}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
         food_date = st.date_input("Food log date", value=datetime.now().date(), key="food_log_date")
         selected_date = food_date.isoformat()
         selected_entries = [entry for entry in food_entries if entry["date"] == selected_date]
