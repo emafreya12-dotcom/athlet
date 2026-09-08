@@ -15,14 +15,14 @@ st.markdown(
     <style>
         .stApp {
             background: #f5f7fa;
-            color: #172033;
+            color: #000000;
         }
         .block-container {
             padding-top: 1.5rem;
             padding-bottom: 2rem;
         }
         h1, h2, h3, h4 {
-            color: #172033;
+            color: #000000;
         }
         .main-header {
             background: #ffffff;
@@ -39,7 +39,7 @@ st.markdown(
             font-size: 2rem;
             font-weight: 800;
             letter-spacing: 0.02em;
-            color: #172033;
+            color: #000000;
         }
         .brand-mark {
             display: inline-flex;
@@ -61,7 +61,7 @@ st.markdown(
             box-shadow: 0 6px 18px rgba(23, 32, 51, 0.05);
         }
         .stMetric [data-testid="stMetricLabel"] {
-            color: #657086;
+            color: #000000;
             font-weight: 600;
         }
         .stMetric [data-testid="stMetricValue"] {
@@ -97,7 +97,7 @@ st.markdown(
         .stTabs [role="tab"] {
             min-height: 54px;
             border-radius: 8px;
-            color: #657086;
+            color: #000000;
             font-weight: 700;
         }
         .stTabs [role="tab"]:hover {
@@ -124,7 +124,7 @@ st.markdown(
             border-radius: 24px;
             overflow: hidden;
             background: linear-gradient(90deg, rgba(4, 18, 33, 0.9), rgba(4, 18, 33, 0.18)),
-                url("https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1600&q=85") center/cover;
+                url("https://images.unsplash.com/photo-1502904550040-7534597429ae?auto=format&fit=crop&w=1600&q=85") center/cover;
             box-shadow: 0 20px 45px rgba(3, 12, 24, 0.4);
         }
         .auth-kicker {
@@ -154,10 +154,10 @@ st.markdown(
         }
         .auth-choice h3 {
             margin-bottom: 4px;
-            color: #ffffff;
+            color: #000000;
         }
         .auth-choice p {
-            color: #ccecff;
+            color: #000000;
             margin-bottom: 0;
         }
         @media (max-width: 700px) {
@@ -761,8 +761,8 @@ with profile_col:
                 <img src="{}" style="width: 90px; height: 90px; object-fit: cover; border-radius: 50%; border: 3px solid #7ce5c7;" />
                 <div>
                     <div style="font-size: 1.2rem; font-weight: 700;">{}</div>
-                    <div style="color: #cfeaff;">{}</div>
-                    <div style="color: #8ae8c3; font-weight: 600; margin-top: 6px;">Goal: {}</div>
+                    <div style="color: #000000;">{}</div>
+                    <div style="color: #16724d; font-weight: 600; margin-top: 6px;">Goal: {}</div>
                 </div>
             </div>
         </div>
