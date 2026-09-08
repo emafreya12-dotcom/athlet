@@ -303,6 +303,29 @@ FOOD_PRESETS = {
         "Kacang almond (20 gr)": 115,
         "Edamame rebus (100g)": 120,
         "Salad sayur (tanpa dressing)": 75,
+        "Quinoa matang (1 porsi)": 222,
+        "Greek yoghurt plain (1 cup)": 130,
+        "Blueberries (1 cup)": 84,
+        "Whole-grain toast (1 slice)": 100,
+        "Peanut butter (1 tbsp)": 95,
+        "Hummus (2 tbsp)": 70,
+        "Chickpeas matang (100g)": 164,
+        "Lentils matang (100g)": 116,
+        "Tofu panggang (100g)": 144,
+        "Shrimp panggang (100g)": 99,
+        "Turkey breast (100g)": 135,
+        "Olive oil (1 tbsp)": 119,
+        "Mixed berries (1 cup)": 70,
+    },
+    "Sports fuel": {
+        "Energy gel (1 sachet)": 100,
+        "Sports drink (500 ml)": 120,
+        "Protein shake (1 serving)": 180,
+        "Granola (50g)": 230,
+        "Peanut butter sandwich (1)": 350,
+        "Banana and yoghurt bowl (1)": 240,
+        "Chocolate milk (300 ml)": 220,
+        "Trail mix (30g)": 150,
     },
     "Minuman": {
         "Air putih": 0,
@@ -987,7 +1010,7 @@ with chemistry_tab:
 
 with biology_tab:
     st.markdown("### Energy and recovery")
-    st.caption("Estimate your baseline energy needs before planning training fuel.")
+    st.caption("Use body data, heart rate, and weekly training to guide recovery and fueling.")
     age = st.number_input("Age", min_value=10, value=28, key="bio_age")
     weight_kg = st.number_input("Weight (kg)", min_value=20.0, value=70.0, key="bio_weight")
     height_cm = st.number_input("Height (cm)", min_value=100.0, value=175.0, key="bio_height")
@@ -1016,26 +1039,71 @@ with biology_tab:
             good=True,
         )
 
+    bmi = weight_kg / (height_cm / 100) ** 2
+    st.metric("BMI", f"{bmi:.1f}")
+    st.caption("Formula: BMI = weight / height². Use this as a screening estimate, not a diagnosis.")
+
+    heart_rate_max = 208 - 0.7 * age
+    zone_col1, zone_col2 = st.columns(2)
+    with zone_col1:
+        resting_hr = st.number_input("Resting heart rate (bpm)", min_value=30, max_value=120, value=60, key="bio_resting_hr")
+    with zone_col2:
+        training_zone = st.selectbox("Training zone", [1, 2, 3, 4, 5], index=1, key="bio_training_zone")
+    heart_rate_low = resting_hr + (heart_rate_max - resting_hr) * (0.50 + (training_zone - 1) * 0.10)
+    heart_rate_high = resting_hr + (heart_rate_max - resting_hr) * (0.60 + (training_zone - 1) * 0.10)
+    st.metric("Recommended heart-rate range", f"{heart_rate_low:.0f}-{heart_rate_high:.0f} bpm")
+
+    bio_col1, bio_col2 = st.columns(2)
+    with bio_col1:
+        weekly_minutes = st.number_input("Weekly training minutes", min_value=0, max_value=3000, value=180, key="bio_weekly_minutes")
+    with bio_col2:
+        session_rpe = st.slider("Session effort (RPE 1-10)", min_value=1, max_value=10, value=6, key="bio_session_rpe")
+    training_load = weekly_minutes * session_rpe
+    estimated_calories = max(0, training_load * 0.08 + (bmr * 0.15))
+    st.metric("Weekly training load", f"{training_load:,} AU")
+    st.metric("Estimated exercise calories", f"{estimated_calories:,.0f} kcal")
+    st.caption("Training load = weekly minutes × perceived effort. Increase gradually and watch sudden spikes.")
+
 with math_tab:
-    st.markdown("### Pace and performance")
-    st.caption("Use distance and time to evaluate training pace.")
-    distance_km = st.number_input("Distance (km)", min_value=0.1, value=5.0, key="math_distance")
-    time_min = st.number_input("Time (min)", min_value=1.0, value=30.0, key="math_time")
-    speed_kmh = distance_km / (time_min / 60)
-    st.metric("Speed", f"{speed_kmh:.2f} km/h")
-    st.caption("Formula: speed = distance / time")
-    st.caption("Use pace trends to guide endurance and tempo work.")
-    if speed_kmh < 6:
-        render_assessment(
-            "Low pace efficiency",
-            "Your pace is below the training target. Focus on endurance pacing, cadence work, and progressive tempo sessions.",
-        )
+    st.markdown("### Sport performance calculator")
+    st.caption("Choose a sport to calculate a useful performance metric.")
+    sport_metric = st.selectbox("Sport metric", ["Running", "Football", "Basketball", "Fencing", "Swimming"], key="math_sport_metric")
+    if sport_metric == "Football":
+        passes_attempted = st.number_input("Passes attempted", min_value=1, value=40, key="math_passes_attempted")
+        passes_completed = st.number_input("Passes completed", min_value=0, max_value=int(passes_attempted), value=min(34, int(passes_attempted)), key="math_passes_completed")
+        distance_km = st.number_input("Distance covered (km)", min_value=0.0, value=8.0, key="math_football_distance")
+        st.metric("Pass accuracy", f"{passes_completed / passes_attempted * 100:.1f}%")
+        st.metric("Distance covered", f"{distance_km:.1f} km")
+    elif sport_metric == "Basketball":
+        field_goals_made = st.number_input("Field goals made", min_value=0, value=8, key="math_fg_made")
+        field_goals_attempted = st.number_input("Field goals attempted", min_value=1, value=16, key="math_fg_attempted")
+        points = st.number_input("Points scored", min_value=0, value=20, key="math_points")
+        minutes_played = st.number_input("Minutes played", min_value=1.0, value=32.0, key="math_basketball_minutes")
+        st.metric("Field-goal percentage", f"{field_goals_made / field_goals_attempted * 100:.1f}%")
+        st.metric("Points per minute", f"{points / minutes_played:.2f}")
+    elif sport_metric == "Fencing":
+        attacks = st.number_input("Successful attacks", min_value=0, value=12, key="math_attacks")
+        attempts = st.number_input("Attack attempts", min_value=1, value=20, key="math_attack_attempts")
+        reaction_ms = st.number_input("Average reaction time (ms)", min_value=1, value=240, key="math_reaction")
+        st.metric("Attack success rate", f"{attacks / attempts * 100:.1f}%")
+        st.metric("Reaction time", f"{reaction_ms:.0f} ms")
+    elif sport_metric == "Swimming":
+        swim_distance = st.number_input("Distance (m)", min_value=25.0, value=100.0, key="math_swim_distance")
+        swim_time = st.number_input("Time (seconds)", min_value=1.0, value=90.0, key="math_swim_time")
+        strokes = st.number_input("Strokes", min_value=1, value=40, key="math_swim_strokes")
+        st.metric("Pace per 100 m", f"{swim_time / swim_distance * 100:.1f} sec")
+        st.metric("SWOLF", f"{swim_time / swim_distance * 100 + strokes:.0f}")
     else:
-        render_assessment(
-            "Solid pace output",
-            "Your speed is in a good performance range. Keep increasing volume with controlled intensity.",
-            good=True,
-        )
+        distance_km = st.number_input("Distance (km)", min_value=0.1, value=5.0, key="math_distance")
+        time_min = st.number_input("Time (min)", min_value=1.0, value=30.0, key="math_time")
+        speed_kmh = distance_km / (time_min / 60)
+        st.metric("Speed", f"{speed_kmh:.2f} km/h")
+        st.metric("Pace", f"{time_min / distance_km:.2f} min/km")
+        st.caption("Formula: speed = distance / time")
+        if speed_kmh < 6:
+            render_assessment("Low pace efficiency", "Focus on endurance pacing, cadence work, and progressive tempo sessions.")
+        else:
+            render_assessment("Solid pace output", "Keep increasing volume with controlled intensity.", good=True)
 
 with food_tab:
     st.markdown("### Daily nutrition planner")
