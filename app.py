@@ -99,26 +99,84 @@ st.markdown(
         .nutrition-commitment-card {
             margin: 12px 0 20px;
             padding: 18px 20px;
-            border: 1px solid #b9d9bd;
-            border-left: 5px solid #3b7558;
+            border: 1px solid #b8dcbc;
+            border-left: 5px solid #77b982;
             border-radius: 10px;
-            background: #edf8ee;
-            color: #1d2927;
+            background: #e4f4e3;
+            color: #23452d;
             box-shadow: 0 6px 18px rgba(59, 117, 88, 0.1);
+        }
+        div[data-testid="stTextArea"] textarea {
+            background: #f0faef;
+            border-color: #b8dcbc;
+            color: #23452d;
         }
         .nutrition-commitment-label {
             margin-bottom: 7px;
-            color: #2f513f;
+            color: #356342 !important;
             font-size: 0.75rem;
             font-weight: 800;
             letter-spacing: 0.1em;
             text-transform: uppercase;
         }
         .nutrition-commitment-text {
-            color: #1d2927;
+            color: #23452d !important;
             font-size: 1.05rem;
             font-weight: 600;
             line-height: 1.55;
+        }
+        .stApp .nutrition-commitment-card,
+        .stApp .nutrition-commitment-card p,
+        .stApp .nutrition-commitment-card [data-testid="stMarkdownContainer"] {
+            color: #23452d !important;
+        }
+        .food-entry-panel {
+            margin: 16px 0 8px;
+            padding: 18px;
+            border: 1px solid #eadfca;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #fffaf0, #fffdf8);
+            box-shadow: 0 8px 20px rgba(116, 82, 36, 0.08);
+        }
+        .food-entry-kicker {
+            margin-bottom: 4px;
+            color: #9a5b2b;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .food-entry-title {
+            margin-bottom: 14px;
+            color: #3b3024;
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .food-input-card {
+            padding: 12px 14px 4px;
+            border: 1px solid #f0dfc3;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.78);
+        }
+        .food-input-card label {
+            color: #594534 !important;
+        }
+        .stApp .st-key-food_item_form label,
+        .stApp .st-key-food_item_form [data-testid="stWidgetLabel"],
+        .stApp .st-key-food_item_form [data-testid="stMarkdownContainer"],
+        .stApp .st-key-food_item_form [data-testid="stMarkdownContainer"] p,
+        .stApp .st-key-food_item_form [role="radiogroup"] label,
+        .stApp .st-key-food_item_form [data-baseweb="select"] {
+            color: #594534 !important;
+        }
+        .stApp .st-key-food_item_form [role="option"] {
+            color: #594534 !important;
+            background: #fffdf8;
+        }
+        .stApp .st-key-food_item_form [role="option"][aria-selected="true"] {
+            color: #ffffff !important;
+            background: #9a5b2b;
         }
         .stTabs [role="tablist"] {
             gap: 8px;
@@ -591,6 +649,202 @@ FOOD_PRESETS = {
     },
 }
 
+DRINK_PRESETS = {
+    "Water and hydration": {
+        "Water": 0,
+        "Mineral water": 0,
+        "Coconut water (250 ml)": 45,
+        "Electrolyte tablet drink (500 ml)": 10,
+        "Low-sugar electrolyte drink (500 ml)": 40,
+    },
+    "Tea and coffee": {
+        "Unsweetened tea": 3,
+        "Black coffee": 4,
+        "Green tea": 2,
+        "Milk tea (250 ml)": 120,
+    },
+    "Milk and recovery": {
+        "Whole milk (250 ml)": 150,
+        "Low-fat milk (250 ml)": 120,
+        "Kefir (250 ml)": 140,
+        "Protein shake (1 serving)": 180,
+        "Chocolate milk (300 ml)": 220,
+    },
+    "Juice and occasional drinks": {
+        "Orange juice (250 ml)": 110,
+        "Apple juice (250 ml)": 120,
+        "Soda (1 can)": 150,
+        "Bubble tea (1 cup)": 400,
+        "Frappuccino (1 cup)": 500,
+    },
+    "Previous drink list": {
+        "Air putih": 0,
+        "Teh tawar": 3,
+        "Kopi hitam": 4,
+        "Jus jeruk (1 gelas)": 110,
+        "Jus apel (1 gelas)": 120,
+        "Susu murni (1 gelas)": 150,
+        "Soda (1 kaleng)": 150,
+        "Bubble tea (1 gelas)": 400,
+        "Frappuccino (1 gelas)": 500,
+    },
+}
+
+FOOD_PRESETS.update(
+    {
+        "High-protein foods": {
+            "Chicken breast (100 g)": 165,
+            "Lean beef (100 g)": 190,
+            "Salmon (100 g)": 200,
+            "Tuna (100 g)": 130,
+            "Greek yogurt (1 cup)": 130,
+            "Cottage cheese (1 cup)": 210,
+            "Egg whites (3)": 51,
+            "Lentils (100 g cooked)": 116,
+            "Chickpeas (100 g cooked)": 164,
+            "Seitan (100 g)": 141,
+        },
+        "Carbohydrate foods": {
+            "White rice (1 cup)": 205,
+            "Brown rice (1 cup)": 215,
+            "Pasta (1 cup cooked)": 220,
+            "Sweet potato (1 medium)": 112,
+            "Bagel (1)": 280,
+            "Rice cakes (2)": 70,
+            "Dates (3)": 200,
+            "Corn tortilla (2)": 104,
+        },
+        "Healthy fats": {
+            "Avocado (1/2)": 160,
+            "Almonds (20 g)": 115,
+            "Walnuts (20 g)": 131,
+            "Chia seeds (1 tbsp)": 60,
+            "Flax seeds (1 tbsp)": 37,
+            "Tahini (1 tbsp)": 89,
+            "Olive oil (1 tbsp)": 119,
+        },
+        "Vegetables and fruit": {
+            "Broccoli (100 g)": 35,
+            "Spinach (100 g)": 23,
+            "Carrot (100 g)": 41,
+            "Bell pepper (100 g)": 31,
+            "Tomato (1 medium)": 22,
+            "Apple (1)": 80,
+            "Banana (1)": 100,
+            "Mango (1 cup)": 99,
+            "Berries (1 cup)": 84,
+        },
+    }
+)
+
+FOOD_CATEGORY_GROUPS = {
+    "Vegetables": {
+        "Broccoli (100 g)": 34,
+        "Spinach (100 g)": 23,
+        "Cauliflower (100 g)": 25,
+        "Carrot (100 g)": 41,
+        "Bell pepper (100 g)": 31,
+        "Cucumber (100 g)": 15,
+        "Tomato (100 g)": 18,
+        "Mushrooms (100 g)": 22,
+        "Zucchini (100 g)": 17,
+    },
+    "Healthy fats": FOOD_PRESETS["Healthy fats"].copy(),
+    "Fruit": {
+        "Apple (100 g)": 52,
+        "Banana (100 g)": 89,
+        "Orange (100 g)": 47,
+        "Mango (100 g)": 60,
+        "Pineapple (100 g)": 50,
+        "Watermelon (100 g)": 30,
+        "Grapes (100 g)": 69,
+        "Strawberries (100 g)": 32,
+        "Blueberries (100 g)": 57,
+        "Papaya (100 g)": 43,
+        "Dates (100 g)": 282,
+    },
+    "Carbohydrate & grains": FOOD_PRESETS["Carbohydrate foods"].copy(),
+    "Plant protein": {
+        "Tofu (100 g)": 76,
+        "Tempeh (100 g)": 195,
+        "Edamame (100 g)": 121,
+        "Lentils, cooked (100 g)": 116,
+        "Chickpeas, cooked (100 g)": 164,
+        "Black beans, cooked (100 g)": 132,
+        "Green peas (100 g)": 84,
+        "Seitan (100 g)": 141,
+    },
+    "Eggs & dairy": {
+        "Whole egg (1 large)": 72,
+        "Egg white (100 g)": 52,
+        "Greek yogurt (100 g)": 59,
+        "Skyr (100 g)": 63,
+        "Cottage cheese (100 g)": 98,
+        "Whole milk (250 ml)": 153,
+        "Low-fat milk (250 ml)": 105,
+        "Cheddar (100 g)": 403,
+        "Mozzarella (100 g)": 280,
+    },
+    "Protein": FOOD_PRESETS["High-protein foods"].copy(),
+    "Seafood & meat": {
+        "Chicken breast (100 g)": 165,
+        "Turkey breast (100 g)": 135,
+        "Lean beef (100 g)": 200,
+        "Pork tenderloin (100 g)": 143,
+        "Lamb (100 g)": 250,
+        "Salmon (100 g)": 208,
+        "Tuna (100 g)": 132,
+        "Cod (100 g)": 82,
+        "Shrimp (100 g)": 99,
+        "Crab (100 g)": 97,
+    },
+    "Food limit": FOOD_PRESETS["Junk food"].copy(),
+    "Other": FOOD_PRESETS["Makanan Indonesia"].copy(),
+}
+
+SPORT_FOOD_ADDITIONS = {
+    "volly": {
+        "Volleyball fuel": {"Banana": 100, "Rice bowl with chicken": 520, "Yogurt and granola": 240},
+    },
+    "run": {
+        "Running fuel": {"Bagel": 280, "Dates (3)": 200, "Oatmeal with banana": 250},
+    },
+    "bycling": {
+        "Cycling fuel": {"Rice cakes (2)": 180, "Peanut butter sandwich": 350, "Energy bar": 220},
+    },
+    "basketball": {
+        "Basketball fuel": {"Turkey sandwich": 360, "Chicken and rice": 520, "Banana": 100},
+    },
+    "swimming": {
+        "Swimming fuel": {"Oatmeal with berries": 280, "Egg and toast": 240, "Chicken pasta": 560},
+    },
+    "football": {
+        "Football fuel": {"Beef and rice": 600, "Potato and eggs": 330, "Turkey wrap": 390},
+    },
+    "badminton": {
+        "Badminton fuel": {"Fruit and yogurt": 210, "Rice and tofu": 430, "Trail mix (30 g)": 150},
+    },
+    "weight lifting": {
+        "Strength fuel": {"Greek yogurt and berries": 220, "Chicken and sweet potato": 520, "Cottage cheese and fruit": 230},
+    },
+    "hocky": {
+        "Hockey fuel": {"Salmon and potatoes": 540, "Turkey pasta": 560, "Oatmeal with milk": 300},
+    },
+    "yoga": {
+        "Yoga fuel": {"Apple and almonds": 195, "Lentil bowl": 380, "Greek yogurt": 130},
+    },
+    "pilates": {
+        "Pilates fuel": {"Eggs and avocado toast": 330, "Quinoa salad": 300, "Cottage cheese and fruit": 230},
+    },
+}
+
+
+def food_presets_for_sport(sport: str) -> dict:
+    presets = {category: items.copy() for category, items in FOOD_CATEGORY_GROUPS.items()}
+    for category, items in SPORT_FOOD_ADDITIONS.get(sport.strip().lower(), {}).items():
+        presets.setdefault("Other", {}).update(items)
+    return presets
+
 
 def get_connection():
     connection = sqlite3.connect(DATABASE_PATH)
@@ -625,7 +879,8 @@ def initialize_database():
                 sport TEXT NOT NULL,
                 goal TEXT NOT NULL,
                 height REAL NOT NULL DEFAULT 0,
-                weekly_target REAL NOT NULL
+                weekly_target REAL NOT NULL,
+                nutrition_commitment TEXT NOT NULL DEFAULT ''
             );
             CREATE TABLE IF NOT EXISTS workouts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -657,6 +912,8 @@ def initialize_database():
             connection.execute("UPDATE profiles SET email = username WHERE email IS NULL OR email = ''")
         if "height" not in profile_columns:
             connection.execute("ALTER TABLE profiles ADD COLUMN height REAL NOT NULL DEFAULT 0")
+        if "nutrition_commitment" not in profile_columns:
+            connection.execute("ALTER TABLE profiles ADD COLUMN nutrition_commitment TEXT NOT NULL DEFAULT ''")
         demo = DEFAULT_PROFILES["demo"]
         connection.execute(
             """
@@ -680,7 +937,7 @@ def initialize_database():
 def get_profile(username: str):
     with get_connection() as connection:
         row = connection.execute(
-            "SELECT username, name, sport, goal, height, weekly_target FROM profiles WHERE username = ?",
+            "SELECT username, name, sport, goal, height, weekly_target, nutrition_commitment FROM profiles WHERE username = ?",
             (username,),
         ).fetchone()
     return dict(row) if row else None
@@ -751,6 +1008,14 @@ def save_profile(username: str, profile: dict):
                 profile["weekly_target"],
                 username,
             ),
+        )
+
+
+def save_nutrition_commitment(username: str, commitment: str):
+    with get_connection() as connection:
+        connection.execute(
+            "UPDATE profiles SET nutrition_commitment = ? WHERE username = ?",
+            (commitment.strip(), username),
         )
 
 
@@ -1061,9 +1326,16 @@ if profile is None:
     st.stop()
 workouts = get_workouts(username)
 food_entries = get_food_entries(username)
+profile_photo = SPORT_PHOTOS.get(
+    profile["sport"].strip().lower(),
+    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400&q=80",
+)
 
 if st.session_state.show_success_flash:
-    st.markdown('<div class="login-success-flash" aria-hidden="true"></div>', unsafe_allow_html=True)
+    st.markdown(
+        f'<div class="login-success-flash" style="background-image: url(\'{profile_photo}\');" aria-hidden="true"></div>',
+        unsafe_allow_html=True,
+    )
     st.session_state.show_success_flash = False
 
 st.markdown(
@@ -1124,10 +1396,6 @@ today_iso = datetime.now().date().isoformat()
 today_food_entries = [entry for entry in food_entries if entry["date"] == today_iso]
 today_calories = sum(entry["calories"] for entry in today_food_entries)
 
-profile_photo = SPORT_PHOTOS.get(
-    profile["sport"].strip().lower(),
-    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400&q=80",
-)
 profile_col, leaderboard_col = st.columns([1.4, 1.2])
 
 with profile_col:
@@ -1433,68 +1701,115 @@ with performance_tab:
 
 with food_tab:
     st.markdown("### Daily nutrition planner")
-    st.caption("Set your commitment first, then add meals one by one before calculating your daily intake.")
-    commitment_key = f"food_commitment_{username}"
+    st.caption("Choose a sport-specific food or drink, or type any item and calorie value you want to track.")
+    default_commitment = profile.get("nutrition_commitment") or f"I will choose food that supports my goal: {profile['goal']}"
+    commitment_state_key = f"nutrition_commitment_input_{username}"
+    if commitment_state_key not in st.session_state:
+        st.session_state[commitment_state_key] = default_commitment
+    commitment = st.text_area(
+        "Nutrition commitment (editable)",
+        height=90,
+        key=commitment_state_key,
+    )
+    if st.button("Save nutrition commitment", key=f"save_commitment_{username}"):
+        if commitment.strip():
+            save_nutrition_commitment(username, commitment)
+            profile["nutrition_commitment"] = commitment.strip()
+            st.session_state[commitment_state_key] = commitment.strip()
+            st.success("Nutrition commitment updated.")
+        else:
+            st.warning("Write a commitment before saving.")
 
-    if not st.session_state.get(commitment_key):
-        st.info(f"Your current performance goal is: {profile['goal']}")
-        with st.form("food_commitment_form"):
-            commitment = st.text_area(
-                "Your nutrition commitment",
-                value=f"I will choose food that supports my goal: {profile['goal']}",
-                height=90,
-            )
-            commitment_submitted = st.form_submit_button("Save commitment and open food list")
-            if commitment_submitted:
-                if commitment.strip():
-                    st.session_state[commitment_key] = commitment.strip()
-                    st.rerun()
-                st.warning("Write a commitment before opening the food calculator.")
-    else:
-        commitment_text = escape(st.session_state[commitment_key])
-        st.markdown(
-            f"""
-            <div class="nutrition-commitment-card">
-                <div class="nutrition-commitment-label">Nutrition commitment</div>
-                <div class="nutrition-commitment-text">{commitment_text}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    commitment_text = escape(profile.get("nutrition_commitment") or default_commitment)
+    st.markdown(
+        f"""
+        <div class="nutrition-commitment-card">
+            <div class="nutrition-commitment-label">Nutrition commitment</div>
+            <div class="nutrition-commitment-text">{commitment_text}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    if commitment_text:
         food_date = st.date_input("Food log date", value=datetime.now().date(), key="food_log_date")
         selected_date = food_date.isoformat()
         selected_entries = [entry for entry in food_entries if entry["date"] == selected_date]
+
+        sport_food_presets = food_presets_for_sport(profile["sport"])
 
         input_mode = st.radio(
             "Calorie input",
             ["Choose from food list", "Input calories myself"],
             horizontal=True,
-            key="food_input_mode",
+            key=f"food_input_mode_{username}",
         )
         with st.form("food_item_form"):
+            st.markdown(
+                '<div class="food-entry-panel"><div class="food-entry-kicker">Build your plate</div><div class="food-entry-title">What are you adding today?</div>',
+                unsafe_allow_html=True,
+            )
             if input_mode == "Input calories myself":
-                food_category = st.selectbox(
+                food_column, drink_column = st.columns(2)
+                with food_column:
+                    st.markdown('<div class="food-input-card">', unsafe_allow_html=True)
+                    food_name = st.text_input("Food name", placeholder="e.g. Chicken and rice", key=f"custom_food_name_{username}")
+                    food_calories = st.number_input("Food calories (kcal)", min_value=0, max_value=3000, step=5, value=200, key=f"custom_food_calories_{username}")
+                    st.markdown('</div>', unsafe_allow_html=True)
+                with drink_column:
+                    st.markdown('<div class="food-input-card">', unsafe_allow_html=True)
+                    drink_name = st.text_input("Drink name (optional)", placeholder="e.g. Coconut water", key=f"custom_drink_name_{username}")
+                    drink_calories = st.number_input("Drink calories (kcal)", min_value=0, max_value=3000, step=5, value=0, key=f"custom_drink_calories_{username}")
+                    st.markdown('</div>', unsafe_allow_html=True)
+                custom_category = st.selectbox(
                     "Category",
-                    list(FOOD_PRESETS) + ["Others"],
-                    key="manual_food_category",
+                    ["Other", "Vegetables", "Healthy fats", "Fruit", "Carbohydrate & grains", "Plant protein", "Eggs & dairy", "Protein", "Seafood & meat", "Food limit"],
+                    key=f"custom_food_category_{username}",
                 )
-                food_name = st.text_input("Food and drink name", key="custom_food_name")
-                custom_category = food_category
-                calories_per_serving = st.number_input(
-                    "Calories for this food or drink (kcal)",
-                    min_value=0,
-                    max_value=3000,
-                    step=5,
-                    value=200,
-                    key="custom_food_calories",
-                )
-                st.caption("Manual mode: type the food name and calorie number yourself. No preset food list is used.")
+                food_name = food_name or drink_name
+                calories_per_serving = food_calories if food_name == st.session_state.get(f"custom_food_name_{username}", "") else drink_calories
+                st.caption("Type a food or drink in its own column. Add one item per submission.")
             else:
-                food_category = st.selectbox("Category", list(FOOD_PRESETS), key="preset_food_category")
-                food_name = st.selectbox("Food or drink", list(FOOD_PRESETS[food_category]), key="preset_food_name")
-                custom_category = food_category
-                calories_per_serving = FOOD_PRESETS[food_category][food_name]
-                st.caption(f"Preset estimate: {calories_per_serving} kcal per serving")
+                selected_item = st.radio(
+                    "Choose food or drink",
+                    ["Food", "Drink"],
+                    horizontal=True,
+                    key=f"preset_item_type_{username}",
+                )
+                if selected_item == "Food":
+                    food_category = st.selectbox(
+                        "Food category",
+                        list(sport_food_presets),
+                        key=f"preset_food_category_{username}",
+                    )
+                    food_name = st.selectbox(
+                        "Food",
+                        list(sport_food_presets[food_category]),
+                        key=f"preset_food_name_{username}_{food_category}",
+                    )
+                    calories_per_serving = sport_food_presets[food_category][food_name]
+                else:
+                    drink_category = st.selectbox(
+                        "Drink category",
+                        ["Drink"],
+                        key=f"preset_drink_category_{username}",
+                    )
+                    drink_options = {
+                        item: calories
+                        for drink_group in DRINK_PRESETS.values()
+                        for item, calories in drink_group.items()
+                    }
+                    drink_name = st.selectbox(
+                        "Drink",
+                        list(drink_options),
+                        key=f"preset_drink_name_{username}",
+                    )
+                    calories_per_serving = drink_options[drink_name]
+                if selected_item == "Food":
+                    custom_category = food_category
+                else:
+                    food_name = drink_name
+                    custom_category = drink_category
+                st.caption(f"{selected_item} estimate: {calories_per_serving} kcal per serving for {profile['sport']}")
             servings = st.number_input("Servings", min_value=0.25, max_value=20.0, step=0.25, value=1.0, key="food_servings")
             item_calories = round(calories_per_serving * servings)
             st.metric("Item calories", f"{item_calories} kcal")
@@ -1514,6 +1829,7 @@ with food_tab:
                         },
                     )
                     st.rerun()
+                    st.markdown('</div>', unsafe_allow_html=True)
 
         if selected_entries:
             st.markdown("#### Today's food list")
