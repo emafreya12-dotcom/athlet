@@ -1567,7 +1567,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 if st.button("Explore Nutrition →", key="explore_nutrition", type="secondary"):
-    st.session_state["nutrition_view"] = "Daily Nutrition"
+    st.session_state["nutrition_view"] = "Food Tracker"
     st.rerun()
 
 progress = min(summary["monthly_hours"] / max(profile["weekly_target"], 1), 1.0)
@@ -1820,7 +1820,7 @@ with performance_tab:
 with food_tab:
     nutrition_view = st.radio(
         "Nutrition workspace",
-        ["Daily Nutrition", "Food Database", "Meal Builder", "Nutrition Calculator", "My Nutrition Progress"],
+        ["Food Tracker", "Food Database", "Meal Builder", "Nutrition Calculator", "Nutrition Progress"],
         horizontal=True,
         key="nutrition_view",
     )
@@ -1858,7 +1858,7 @@ with food_tab:
     action_col1.button("🍎 Find Food", key="nutrition_find_food", on_click=lambda: st.session_state.update(nutrition_view="Food Database"))
     action_col2.button("🍱 Build a Meal", key="nutrition_build_meal", on_click=lambda: st.session_state.update(nutrition_view="Meal Builder"))
     action_col3.button("🧮 Calculate Nutrition", key="nutrition_calculate", on_click=lambda: st.session_state.update(nutrition_view="Nutrition Calculator"))
-    action_col4.button("📊 View Progress", key="nutrition_progress", on_click=lambda: st.session_state.update(nutrition_view="My Nutrition Progress"))
+    action_col4.button("📊 View Progress", key="nutrition_progress", on_click=lambda: st.session_state.update(nutrition_view="Nutrition Progress"))
 
     if nutrition_view == "Food Database":
         st.markdown("### Food Database")
@@ -1932,8 +1932,8 @@ with food_tab:
         calculator_results[2].metric("Suggested protein range", f"{calculator_weight * 1.4:.0f}-{calculator_weight * 2:.0f} g")
         st.caption("These are estimates for planning, not medical advice. Actual needs vary with training, climate, and individual health.")
 
-    elif nutrition_view == "My Nutrition Progress":
-        st.markdown("### 📊 My Nutrition Progress")
+    elif nutrition_view == "Nutrition Progress":
+        st.markdown("### 📊 Nutrition Progress")
         progress_by_date = {}
         for entry in food_entries:
             progress_by_date[entry["date"]] = progress_by_date.get(entry["date"], 0) + entry["calories"]
@@ -1947,7 +1947,7 @@ with food_tab:
             st.info("Add food entries to see your nutrition progress here.")
 
     st.divider()
-    st.markdown("### Daily nutrition planner")
+    st.markdown("### Food Tracker")
     st.caption("Choose a sport-specific food or drink, or type any item and calorie value you want to track.")
     default_commitment = profile.get("nutrition_commitment") or f"I will choose food that supports my goal: {profile['goal']}"
     commitment_state_key = f"nutrition_commitment_input_{username}"
@@ -2024,13 +2024,13 @@ with food_tab:
                 )
                 if selected_item == "Food":
                     food_category = st.selectbox(
-                        "Food category",
+                        "1. Choose a food category",
                         list(sport_food_presets),
                         key=f"preset_food_category_{username}",
                     )
                     food_options = list(sport_food_presets[food_category])
                     food_name = st.selectbox(
-                        "Food",
+                        f"2. Choose a food from {food_category}",
                         food_options,
                     )
                     calories_per_serving = sport_food_presets[food_category][food_name]
@@ -2056,7 +2056,10 @@ with food_tab:
                 else:
                     food_name = drink_name
                     custom_category = drink_category
-                st.caption(f"{selected_item} estimate: {calories_per_serving} kcal per serving for {profile['sport']}")
+                st.caption(
+                    f"Selected category: {custom_category} · {selected_item} estimate: "
+                    f"{calories_per_serving} kcal per serving for {profile['sport']}"
+                )
             servings = st.number_input("Servings", min_value=0.25, max_value=20.0, step=0.25, value=1.0, key="food_servings")
             item_calories = round(calories_per_serving * servings)
             st.metric("Item calories", f"{item_calories} kcal")
