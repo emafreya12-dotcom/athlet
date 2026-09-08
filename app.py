@@ -2226,7 +2226,7 @@ with food_tab:
     if nutrition_view == "Food Database":
         database_mode = st.session_state.get("nutrition_database_item_type", "Food")
         tracker_mode = "Drink" if database_mode == "Drinks" else "Food"
-        tracker_mode_key = f"preset_item_type_{username}"
+        tracker_mode_key = f"preset_item_type_{username}_{nutrition_view}"
         if st.session_state.get(tracker_mode_key) != tracker_mode:
             st.session_state[tracker_mode_key] = tracker_mode
     stored_commitment = profile.get("nutrition_commitment") or ""
@@ -2297,7 +2297,7 @@ with food_tab:
                     "What do you want to add?",
                     ["Food", "Drink"],
                     horizontal=True,
-                    key=f"preset_item_type_{username}",
+                    key=f"preset_item_type_{username}_{nutrition_view}",
                 )
                 if selected_item == "Food":
                     food_search = st.text_input(
