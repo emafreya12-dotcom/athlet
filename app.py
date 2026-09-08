@@ -778,17 +778,15 @@ def render_assessment(status: str, detail: str, good: bool = False):
     if good:
         bg = "rgba(61, 217, 178, 0.12)"
         border = "rgba(61, 217, 178, 0.45)"
-        text = "#d8fff1"
         label = "✅ Good"
     else:
         bg = "rgba(255, 104, 104, 0.12)"
         border = "rgba(255, 104, 104, 0.5)"
-        text = "#ffdede"
         label = "⚠️ Needs attention"
 
     st.markdown(
         f"""
-        <div style="margin-top: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid {border}; background: {bg}; color: {text};">
+        <div style="margin-top: 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid {border}; background: {bg}; color: #000000;">
             <div style="font-weight: 700; margin-bottom: 6px;">{label} - {status}</div>
             <div>{detail}</div>
         </div>
@@ -1069,26 +1067,6 @@ with st.sidebar:
             save_profile(username, profile)
             st.success("Profile saved.")
 
-    st.header("Add workout")
-    with st.form("workout_form"):
-        workout_name = st.text_input("Workout name", "Tempo run")
-        workout_date = st.date_input("Date")
-        duration = st.number_input("Duration (minutes)", min_value=10, step=5, value=45)
-        workout_type = st.selectbox("Type", ["Endurance", "Strength", "Speed", "Recovery", "Mobility"])
-        submitted = st.form_submit_button("Add workout")
-        if submitted:
-            workouts.append(
-                {
-                    "date": workout_date.isoformat(),
-                    "name": workout_name,
-                    "sport": profile["sport"],
-                    "duration": int(duration),
-                    "type": workout_type,
-                }
-            )
-            save_workout(username, workouts[-1])
-            st.success("Workout added.")
-
     with st.container(key="logout_container"):
         if st.button("Logout", use_container_width=True):
             st.session_state.current_user = None
@@ -1228,140 +1206,100 @@ physics_tab, chemistry_tab, biology_tab, math_tab, performance_tab, food_tab = s
     ["⚡ Physics", "💧 Chemistry", "🫀 Biology", "📐 Math", "🏅 Performance", "🍽️ Makanan"]
 )
 
+sport_name = profile["sport"]
+sport_key = sport_name.strip().lower()
+
 with physics_tab:
-    st.markdown("### Power and movement")
-    st.caption("Enter your movement data to evaluate power output.")
-    mass_kg = st.number_input("Mass (kg)", min_value=1.0, value=70.0, key="physics_mass")
-    velocity_m_s = st.number_input("Velocity (m/s)", min_value=0.0, value=8.0, key="physics_velocity")
-    kinetic_energy = 0.5 * mass_kg * velocity_m_s ** 2
-    st.metric("Kinetic Energy", f"{kinetic_energy:.2f} J")
-    st.caption("Formula: Ek = 1/2 mv²")
-    st.caption("Movement energy rises with both speed and mass.")
-    if velocity_m_s < 5:
-        render_assessment(
-            "Low speed / power output",
-            "Your movement output is below a strong training range. Prioritize sprint mechanics, acceleration work, and explosive strength sessions.",
-        )
+    st.markdown(f"### {sport_name} physics")
+    st.caption("This calculator is selected automatically from your registered sport.")
+    mass_kg = st.number_input("Body mass (kg)", min_value=1.0, value=70.0, key="physics_mass")
+    if sport_key == "volly":
+        jump_height = st.number_input("Vertical jump height (m)", min_value=0.01, value=0.45, key="physics_jump_height")
+        push_time = st.number_input("Take-off time (s)", min_value=0.05, value=0.35, key="physics_jump_time")
+        power = mass_kg * 9.81 * jump_height / push_time
+        st.metric("Jump power", f"{power:.0f} W")
+        st.caption("Formula: P = mgh / t")
+    elif sport_key in {"run", "bycling"}:
+        speed = st.number_input("Speed (m/s)", min_value=0.0, value=8.0 if sport_key == "run" else 7.0, key="physics_speed")
+        grade = st.number_input("Incline (%)", min_value=0.0, max_value=30.0, value=1.0, key="physics_grade")
+        power = mass_kg * 9.81 * speed * (grade / 100)
+        st.metric("Hill power", f"{power:.0f} W")
+        st.caption("Formula: P = mgv × grade")
+    elif sport_key in {"weight lifting", "basketball", "football", "hocky", "badminton"}:
+        load = st.number_input("Moved load (kg)", min_value=1.0, value=mass_kg, key="physics_load")
+        movement_speed = st.number_input("Movement speed (m/s)", min_value=0.01, value=1.5, key="physics_movement_speed")
+        movement_time = st.number_input("Movement time (s)", min_value=0.05, value=0.5, key="physics_movement_time")
+        power = 0.5 * load * movement_speed**2 / movement_time
+        st.metric("Explosive power", f"{power:.0f} W")
+        st.caption("Formula: P = 1/2 mv² / t")
     else:
-        render_assessment(
-            "Good power output",
-            "Speed is in a strong range for performance work. Maintain this with regular sprint and power sessions.",
-            good=True,
-        )
+        movement_speed = st.number_input("Movement speed (m/s)", min_value=0.0, value=2.0, key="physics_movement_speed")
+        movement_time = st.number_input("Movement time (s)", min_value=0.05, value=1.0, key="physics_movement_time")
+        power = 0.5 * mass_kg * movement_speed**2 / movement_time
+        st.metric("Movement power", f"{power:.0f} W")
+        st.caption("Formula: P = 1/2 mv² / t")
+    render_assessment(
+        "Power calculation ready",
+        f"Use this {sport_name} result to compare sessions under similar conditions.",
+        good=True,
+    )
 
 with chemistry_tab:
-    st.markdown("### Hydration and heat")
-    st.caption("Enter body and training conditions to estimate fluid needs.")
-    body_weight = st.number_input("Body weight (kg)", min_value=20.0, value=70.0, key="chem_weight")
-    sweat_loss = st.number_input("Sweat loss (L)", min_value=0.0, value=1.5, key="chem_sweat")
-    heat = st.number_input("Temperature (°C)", min_value=10.0, value=28.0, key="chem_temp")
-    hydration = body_weight * 0.033 + sweat_loss + max(0, heat - 25) * 0.1
-    st.metric("Hydration Need", f"{hydration:.2f} L")
-    st.caption("Formula: H = 0.033W + sweat loss + heat bonus")
-    st.caption("Fluid replacement supports electrolyte balance and performance.")
-    if hydration < 1.5:
-        render_assessment(
-            "Dehydration risk",
-            "Your fluid target is low for training. Drink more water, add electrolytes, and hydrate before, during, and after training.",
-        )
-    elif hydration < 2.0:
-        render_assessment(
-            "Hydration is borderline",
-            "Increase water intake and consider a sodium/electrolyte drink during hot or long sessions.",
-        )
-    else:
-        render_assessment(
-            "Good hydration plan",
-            "Hydration support is solid. Maintain your fluid timing around training and long sessions.",
-            good=True,
-        )
+    st.markdown(f"### {sport_name} chemistry")
+    st.caption("Estimate water and sodium replacement from this sport session.")
+    body_weight = st.number_input("Body weight (kg)", min_value=20.0, value=float(profile["height"] / 2.4), key="chem_weight")
+    session_minutes = st.number_input("Session duration (minutes)", min_value=1.0, value=60.0, key="chem_duration")
+    sweat_rate = st.number_input("Sweat loss (L/hour)", min_value=0.0, value=0.8, key="chem_sweat_rate")
+    sweat_loss = sweat_rate * session_minutes / 60
+    fluid_need = sweat_loss * 1.25
+    sodium_need = sweat_loss * 800
+    st.metric("Fluid replacement", f"{fluid_need:.2f} L")
+    st.metric("Estimated sodium replacement", f"{sodium_need:.0f} mg")
+    st.caption("Formula: sweat loss = rate × duration; replacement target = 125% of loss; sodium estimate = 800 mg/L.")
+    render_assessment("Session chemistry ready", f"Plan fluids and electrolytes around your {sport_name} session.", good=True)
 
 with biology_tab:
-    st.markdown("### Energy and recovery")
-    st.caption("Use body data, heart rate, and weekly training to guide recovery and fueling.")
+    st.markdown(f"### {sport_name} biology")
+    st.caption("Estimate sport-session energy use and heart-rate training zones.")
     age = st.number_input("Age", min_value=10, value=28, key="bio_age")
     weight_kg = st.number_input("Weight (kg)", min_value=20.0, value=70.0, key="bio_weight")
-    height_cm = st.number_input("Height (cm)", min_value=100.0, value=175.0, key="bio_height")
-    sex = st.selectbox("Sex", ["Male", "Female"], key="bio_sex")
-    if sex == "Male":
-        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age + 5
-    else:
-        bmr = 10 * weight_kg + 6.25 * height_cm - 5 * age - 161
-    st.metric("BMR", f"{bmr:.0f} kcal/day")
-    st.caption("Formula: BMR = 10W + 6.25H - 5A ± 5")
-    st.caption("BMR estimates baseline calories at rest.")
-    if bmr < 1400:
-        render_assessment(
-            "Low resting energy need",
-            "Your baseline energy need is low for high training demands. Improve nutrition quality and total calorie intake to support recovery.",
-        )
-    elif bmr > 2200:
-        render_assessment(
-            "High baseline energy need",
-            "Prioritize recovery with enough carbohydrates, protein, and calories around training.",
-        )
-    else:
-        render_assessment(
-            "Balanced energy profile",
-            "Resting energy demand is supportive of sustained training. Keep consistent fueling and recovery habits.",
-            good=True,
-        )
-
-    bmi = weight_kg / (height_cm / 100) ** 2
-    st.metric("BMI", f"{bmi:.1f}")
-    st.caption("Formula: BMI = weight / height². Use this as a screening estimate, not a diagnosis.")
-
+    sport_met = {"volly": 8.0, "run": 9.8, "bycling": 8.0, "basketball": 8.0, "swimming": 8.3, "football": 10.0, "badminton": 7.0, "weight lifting": 6.0, "hocky": 8.0, "yoga": 2.5, "pilates": 3.0}.get(sport_key, 6.0)
+    minutes = st.number_input("Session duration (minutes)", min_value=1.0, value=60.0, key="bio_session_minutes")
+    calories = sport_met * 3.5 * weight_kg / 200 * minutes
+    st.metric(f"Estimated {sport_name} calories", f"{calories:,.0f} kcal")
+    st.caption(f"Formula: kcal = MET × 3.5 × body mass × minutes / 200; selected MET = {sport_met:.1f}.")
     heart_rate_max = 208 - 0.7 * age
-    zone_col1, zone_col2 = st.columns(2)
-    with zone_col1:
-        resting_hr = st.number_input("Resting heart rate (bpm)", min_value=30, max_value=120, value=60, key="bio_resting_hr")
-    with zone_col2:
-        training_zone = st.selectbox("Training zone", [1, 2, 3, 4, 5], index=1, key="bio_training_zone")
+    resting_hr = st.number_input("Resting heart rate (bpm)", min_value=30, max_value=120, value=60, key="bio_resting_hr")
+    training_zone = st.selectbox("Training zone", [1, 2, 3, 4, 5], index=1, key="bio_training_zone")
     heart_rate_low = resting_hr + (heart_rate_max - resting_hr) * (0.50 + (training_zone - 1) * 0.10)
     heart_rate_high = resting_hr + (heart_rate_max - resting_hr) * (0.60 + (training_zone - 1) * 0.10)
     st.metric("Recommended heart-rate range", f"{heart_rate_low:.0f}-{heart_rate_high:.0f} bpm")
-
-    bio_col1, bio_col2 = st.columns(2)
-    with bio_col1:
-        weekly_minutes = st.number_input("Weekly training minutes", min_value=0, max_value=3000, value=180, key="bio_weekly_minutes")
-    with bio_col2:
-        session_rpe = st.slider("Session effort (RPE 1-10)", min_value=1, max_value=10, value=6, key="bio_session_rpe")
-    training_load = weekly_minutes * session_rpe
-    estimated_calories = max(0, training_load * 0.08 + (bmr * 0.15))
-    st.metric("Weekly training load", f"{training_load:,} AU")
-    st.metric("Estimated exercise calories", f"{estimated_calories:,.0f} kcal")
-    st.caption("Training load = weekly minutes × perceived effort. Increase gradually and watch sudden spikes.")
+    st.caption("Formula: Karvonen-style reserve zone using estimated max HR = 208 - 0.7 × age.")
+    render_assessment("Sport energy estimate ready", f"Use the {sport_name} estimate with your actual session duration and effort.", good=True)
 
 with math_tab:
-    st.markdown("### Sport performance calculator")
-    st.caption("Choose a sport to calculate a useful performance metric.")
-    sport_metric = st.selectbox("Sport metric", ["Running", "Football", "Basketball", "Fencing", "Swimming"], key="math_sport_metric")
-    if sport_metric == "Football":
+    st.markdown(f"### {sport_name} math")
+    st.caption("Your registered sport selects the performance calculation automatically.")
+    if sport_key == "football":
         passes_attempted = st.number_input("Passes attempted", min_value=1, value=40, key="math_passes_attempted")
         passes_completed = st.number_input("Passes completed", min_value=0, max_value=int(passes_attempted), value=min(34, int(passes_attempted)), key="math_passes_completed")
         distance_km = st.number_input("Distance covered (km)", min_value=0.0, value=8.0, key="math_football_distance")
         st.metric("Pass accuracy", f"{passes_completed / passes_attempted * 100:.1f}%")
         st.metric("Distance covered", f"{distance_km:.1f} km")
-    elif sport_metric == "Basketball":
+    elif sport_key == "basketball":
         field_goals_made = st.number_input("Field goals made", min_value=0, value=8, key="math_fg_made")
         field_goals_attempted = st.number_input("Field goals attempted", min_value=1, value=16, key="math_fg_attempted")
         points = st.number_input("Points scored", min_value=0, value=20, key="math_points")
         minutes_played = st.number_input("Minutes played", min_value=1.0, value=32.0, key="math_basketball_minutes")
         st.metric("Field-goal percentage", f"{field_goals_made / field_goals_attempted * 100:.1f}%")
         st.metric("Points per minute", f"{points / minutes_played:.2f}")
-    elif sport_metric == "Fencing":
-        attacks = st.number_input("Successful attacks", min_value=0, value=12, key="math_attacks")
-        attempts = st.number_input("Attack attempts", min_value=1, value=20, key="math_attack_attempts")
-        reaction_ms = st.number_input("Average reaction time (ms)", min_value=1, value=240, key="math_reaction")
-        st.metric("Attack success rate", f"{attacks / attempts * 100:.1f}%")
-        st.metric("Reaction time", f"{reaction_ms:.0f} ms")
-    elif sport_metric == "Swimming":
+    elif sport_key == "swimming":
         swim_distance = st.number_input("Distance (m)", min_value=25.0, value=100.0, key="math_swim_distance")
         swim_time = st.number_input("Time (seconds)", min_value=1.0, value=90.0, key="math_swim_time")
         strokes = st.number_input("Strokes", min_value=1, value=40, key="math_swim_strokes")
         st.metric("Pace per 100 m", f"{swim_time / swim_distance * 100:.1f} sec")
         st.metric("SWOLF", f"{swim_time / swim_distance * 100 + strokes:.0f}")
-    else:
+    elif sport_key == "run":
         distance_km = st.number_input("Distance (km)", min_value=0.1, value=5.0, key="math_distance")
         time_min = st.number_input("Time (min)", min_value=1.0, value=30.0, key="math_time")
         speed_kmh = distance_km / (time_min / 60)
@@ -1372,6 +1310,35 @@ with math_tab:
             render_assessment("Low pace efficiency", "Focus on endurance pacing, cadence work, and progressive tempo sessions.")
         else:
             render_assessment("Solid pace output", "Keep increasing volume with controlled intensity.", good=True)
+    elif sport_key == "bycling":
+        distance_km = st.number_input("Distance (km)", min_value=0.1, value=20.0, key="math_cycle_distance")
+        time_min = st.number_input("Ride time (min)", min_value=1.0, value=60.0, key="math_cycle_time")
+        elevation = st.number_input("Elevation gain (m)", min_value=0.0, value=200.0, key="math_cycle_elevation")
+        st.metric("Average speed", f"{distance_km / (time_min / 60):.2f} km/h")
+        st.metric("Climbing rate", f"{elevation / (time_min / 60):.0f} m/h")
+    elif sport_key == "volly":
+        successful = st.number_input("Successful attacks", min_value=0, value=12, key="math_volly_success")
+        attempts = st.number_input("Attack attempts", min_value=1, value=20, key="math_volly_attempts")
+        jumps = st.number_input("Jumps", min_value=1, value=30, key="math_volly_jumps")
+        st.metric("Attack success rate", f"{successful / attempts * 100:.1f}%")
+        st.metric("Jump rate", f"{jumps:.0f} jumps/session")
+    elif sport_key in {"badminton", "hocky"}:
+        shots = st.number_input("Successful shots", min_value=0, value=20, key="math_shots_success")
+        attempts = st.number_input("Shot attempts", min_value=1, value=35, key="math_shot_attempts")
+        match_minutes = st.number_input("Match time (min)", min_value=1.0, value=60.0, key="math_match_minutes")
+        st.metric("Shot success rate", f"{shots / attempts * 100:.1f}%")
+        st.metric("Shot rate", f"{attempts / match_minutes:.2f}/min")
+    elif sport_key == "weight lifting":
+        load = st.number_input("Weight lifted (kg)", min_value=1.0, value=60.0, key="math_lift_load")
+        reps = st.number_input("Repetitions", min_value=1, value=8, key="math_lift_reps")
+        sets = st.number_input("Sets", min_value=1, value=3, key="math_lift_sets")
+        st.metric("Training volume", f"{load * reps * sets:.0f} kg")
+        st.metric("Estimated 1RM", f"{load * (1 + reps / 30):.1f} kg")
+    else:
+        minutes = st.number_input("Practice time (minutes)", min_value=1.0, value=45.0, key="math_practice_minutes")
+        sessions = st.number_input("Sessions per week", min_value=1, value=3, key="math_practice_sessions")
+        st.metric("Weekly practice time", f"{minutes * sessions:.0f} min")
+        st.metric("Average session", f"{minutes:.0f} min")
 
 with performance_tab:
     st.markdown("### Performance math calculator")
