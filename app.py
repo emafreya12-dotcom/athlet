@@ -2273,6 +2273,30 @@ with food_tab:
             horizontal=True,
             key=f"food_input_mode_{username}",
         )
+        tracker_type_key = f"nutrition_item_type_{username}"
+        if tracker_type_key not in st.session_state:
+            st.session_state[tracker_type_key] = "Food"
+        if input_mode == "Choose from food list":
+            food_button, drinks_button = st.columns(2)
+            with food_button:
+                if st.button(
+                    "Food",
+                    key=f"nutrition_food_button_{username}",
+                    type="primary" if st.session_state[tracker_type_key] == "Food" else "secondary",
+                    use_container_width=True,
+                ):
+                    st.session_state[tracker_type_key] = "Food"
+                    st.rerun()
+            with drinks_button:
+                if st.button(
+                    "Drinks",
+                    key=f"nutrition_drinks_button_{username}",
+                    type="primary" if st.session_state[tracker_type_key] == "Drinks" else "secondary",
+                    use_container_width=True,
+                ):
+                    st.session_state[tracker_type_key] = "Drinks"
+                    st.rerun()
+        selected_item = st.session_state[tracker_type_key]
         with st.form("food_item_form"):
             st.markdown(
                 '<div class="food-entry-panel"><div class="food-entry-kicker">Add nutrition</div><div class="food-entry-title">What are you adding today?</div>',
@@ -2293,12 +2317,6 @@ with food_tab:
                 st.caption("Enter one food or drink directly, then choose the amount below.")
                 selected_macros = None
             else:
-                selected_item = st.radio(
-                    "What do you want to add?",
-                    ["Food", "Drinks"],
-                    horizontal=True,
-                    key=f"nutrition_item_type_{username}",
-                )
                 if selected_item == "Food":
                     food_search = st.text_input(
                         "Search individual foods",
