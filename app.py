@@ -111,6 +111,16 @@ st.markdown(
         .sidebar-content {
             background: #ffffff;
         }
+        section[data-testid="stSidebar"] button {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #cbd5e1;
+        }
+        section[data-testid="stSidebar"] button:hover {
+            background: #f1f5f9;
+            color: #000000;
+            border-color: #94a3b8;
+        }
         .auth-page {
             max-width: 1120px;
             margin: 0 auto;
