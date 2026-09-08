@@ -162,6 +162,50 @@ st.markdown(
         .food-input-card label {
             color: #594534 !important;
         }
+        .nutrition-dashboard-card {
+            margin: 22px 0 18px;
+            padding: 24px 26px;
+            border: 1px solid #c8e3c9;
+            border-radius: 16px;
+            background: #e8f5e9;
+            color: #244b32;
+            box-shadow: 0 8px 22px rgba(76, 120, 79, 0.1);
+        }
+        .nutrition-dashboard-card h3 {
+            margin: 0 0 6px;
+            color: #244b32;
+        }
+        .nutrition-dashboard-card p {
+            margin: 0;
+            color: #466a4f !important;
+        }
+        .nutrition-summary-card {
+            min-height: 118px;
+            padding: 16px;
+            border: 1px solid #e1e8df;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+        .nutrition-summary-label {
+            color: #66736a;
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+        .nutrition-summary-value {
+            margin: 7px 0;
+            color: #244b32;
+            font-size: 1.35rem;
+            font-weight: 800;
+        }
+        .nutrition-summary-card .stProgress > div > div {
+            background: #77b982;
+        }
+        .nutrition-action-card {
+            padding: 16px;
+            border: 1px solid #eadfca;
+            border-radius: 12px;
+            background: #fffaf0;
+        }
         .stApp .st-key-food_item_form label,
         .stApp .st-key-food_item_form [data-testid="stWidgetLabel"],
         .stApp .st-key-food_item_form [data-testid="stMarkdownContainer"],
@@ -802,6 +846,17 @@ FOOD_CATEGORY_GROUPS = {
     "Other": FOOD_PRESETS["Makanan Indonesia"].copy(),
 }
 
+NUTRITION_FOODS = {
+    "Chicken breast": {"category": "Protein", "serving": 100, "unit": "g", "calories": 165, "protein": 31.0, "carbs": 0.0, "fat": 3.6},
+    "White rice": {"category": "Carbohydrate & grains", "serving": 100, "unit": "g", "calories": 130, "protein": 2.7, "carbs": 28.0, "fat": 0.3},
+    "Broccoli": {"category": "Vegetables", "serving": 100, "unit": "g", "calories": 34, "protein": 2.8, "carbs": 6.6, "fat": 0.4},
+    "Avocado": {"category": "Healthy fats", "serving": 100, "unit": "g", "calories": 160, "protein": 2.0, "carbs": 8.5, "fat": 14.7},
+    "Greek yogurt": {"category": "Eggs & dairy", "serving": 100, "unit": "g", "calories": 59, "protein": 10.0, "carbs": 3.6, "fat": 0.4},
+    "Salmon": {"category": "Seafood & meat", "serving": 100, "unit": "g", "calories": 208, "protein": 20.4, "carbs": 0.0, "fat": 13.4},
+    "Tofu": {"category": "Plant protein", "serving": 100, "unit": "g", "calories": 76, "protein": 8.0, "carbs": 1.9, "fat": 4.8},
+    "Banana": {"category": "Fruit", "serving": 100, "unit": "g", "calories": 89, "protein": 1.1, "carbs": 22.8, "fat": 0.3},
+}
+
 SPORT_FOOD_ADDITIONS = {
     "volly": {
         "Volleyball fuel": {"Banana": 100, "Rice bowl with chicken": 520, "Yogurt and granola": 240},
@@ -844,6 +899,32 @@ def food_presets_for_sport(sport: str) -> dict:
     for category, items in SPORT_FOOD_ADDITIONS.get(sport.strip().lower(), {}).items():
         presets.setdefault("Other", {}).update(items)
     return presets
+
+
+MACRO_RATIOS = {
+    "Protein": (0.55, 0.05, 0.40),
+    "Seafood & meat": (0.45, 0.05, 0.50),
+    "Plant protein": (0.30, 0.30, 0.40),
+    "Eggs & dairy": (0.30, 0.20, 0.50),
+    "Carbohydrate & grains": (0.10, 0.80, 0.10),
+    "Fruit": (0.05, 0.90, 0.05),
+    "Vegetables": (0.15, 0.75, 0.10),
+    "Healthy fats": (0.05, 0.10, 0.85),
+    "Food limit": (0.10, 0.45, 0.45),
+    "Other": (0.15, 0.55, 0.30),
+}
+
+
+def nutrition_totals(entries: list[dict]) -> dict:
+    totals = {"calories": 0, "protein": 0.0, "carbs": 0.0, "fat": 0.0}
+    for entry in entries:
+        calories = float(entry["calories"])
+        protein_ratio, carbs_ratio, fat_ratio = MACRO_RATIOS.get(entry["category"], MACRO_RATIOS["Other"])
+        totals["calories"] += calories
+        totals["protein"] += calories * protein_ratio / 4
+        totals["carbs"] += calories * carbs_ratio / 4
+        totals["fat"] += calories * fat_ratio / 9
+    return totals
 
 
 def get_connection():
@@ -1449,8 +1530,21 @@ col7.metric("Weekly target", f"{profile['weekly_target']} h")
 food_metric_col, food_note_col = st.columns([1, 2])
 food_metric_col.metric("Today's calories", f"{today_calories:,} kcal")
 food_note_col.caption(
-    "Open the Makanan tab beside Math to set your commitment, add meals, and calculate your daily intake."
+    "Open Nutrition to set your commitment, add meals, and calculate your daily intake."
 )
+
+st.markdown(
+    """
+    <div class="nutrition-dashboard-card">
+        <h3>🥗 Commitment Nutrition</h3>
+        <p>Build healthier eating habits and fuel your performance.</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+if st.button("Explore Nutrition →", key="explore_nutrition", type="secondary"):
+    st.session_state["nutrition_view"] = "Daily Nutrition"
+    st.rerun()
 
 progress = min(summary["monthly_hours"] / max(profile["weekly_target"], 1), 1.0)
 st.subheader("Progress toward goal")
@@ -1512,8 +1606,8 @@ with st.form("calendar_workout_form"):
 
 st.subheader("Science & Performance Hub")
 
-physics_tab, chemistry_tab, biology_tab, math_tab, performance_tab, food_tab = st.tabs(
-    ["⚡ Physics", "💧 Chemistry", "🫀 Biology", "📐 Math", "🏅 Performance", "🍽️ Makanan"]
+food_tab, physics_tab, chemistry_tab, biology_tab, math_tab, performance_tab = st.tabs(
+    ["🥗 Nutrition", "⚡ Physics", "💧 Chemistry", "🫀 Biology", "📐 Math", "🏅 Performance"]
 )
 
 sport_name = profile["sport"]
@@ -1700,6 +1794,135 @@ with performance_tab:
         )
 
 with food_tab:
+    nutrition_view = st.radio(
+        "Nutrition workspace",
+        ["Daily Nutrition", "Food Database", "Meal Builder", "Nutrition Calculator", "My Nutrition Progress"],
+        horizontal=True,
+        key="nutrition_view",
+    )
+    nutrition_totals_today = nutrition_totals(today_food_entries)
+    nutrition_goal = profile["goal"] or "General fitness"
+    calorie_target = 2600 if "muscle" in nutrition_goal.lower() else 2400
+    macro_targets = {"protein": 160, "carbs": 300, "fat": 70}
+
+    st.markdown("## 🥗 Nutrition")
+    st.caption("Fuel your body based on your sport, training, and goals.")
+    context_col1, context_col2, context_col3 = st.columns(3)
+    context_col1.metric("Your sport", profile["sport"])
+    context_col2.metric("Your goal", profile["goal"])
+    context_col3.metric("Today's nutrition", f"{nutrition_totals_today['calories']:,.0f} / {calorie_target:,} kcal")
+
+    st.markdown("### Nutrition summary")
+    summary_cards = st.columns(4)
+    summary_values = [
+        ("🔥 Calories", f"{nutrition_totals_today['calories']:,.0f} / {calorie_target:,} kcal", nutrition_totals_today["calories"] / calorie_target),
+        ("💪 Protein", f"{nutrition_totals_today['protein']:.0f} / {macro_targets['protein']} g", nutrition_totals_today["protein"] / macro_targets["protein"]),
+        ("⚡ Carbs", f"{nutrition_totals_today['carbs']:.0f} / {macro_targets['carbs']} g", nutrition_totals_today["carbs"] / macro_targets["carbs"]),
+        ("🥑 Fat", f"{nutrition_totals_today['fat']:.0f} / {macro_targets['fat']} g", nutrition_totals_today["fat"] / macro_targets["fat"]),
+    ]
+    for summary_card, (label, value, completion) in zip(summary_cards, summary_values):
+        with summary_card:
+            st.markdown(
+                f'<div class="nutrition-summary-card"><div class="nutrition-summary-label">{label}</div><div class="nutrition-summary-value">{value}</div></div>',
+                unsafe_allow_html=True,
+            )
+            st.progress(min(completion, 1.0))
+    st.caption("Protein, carbohydrate, and fat values are approximate estimates based on each logged food category.")
+
+    st.markdown("### What would you like to do?")
+    action_col1, action_col2, action_col3, action_col4 = st.columns(4)
+    action_col1.button("🍎 Find Food", key="nutrition_find_food", on_click=lambda: st.session_state.update(nutrition_view="Food Database"))
+    action_col2.button("🍱 Build a Meal", key="nutrition_build_meal", on_click=lambda: st.session_state.update(nutrition_view="Meal Builder"))
+    action_col3.button("🧮 Calculate Nutrition", key="nutrition_calculate", on_click=lambda: st.session_state.update(nutrition_view="Nutrition Calculator"))
+    action_col4.button("📊 View Progress", key="nutrition_progress", on_click=lambda: st.session_state.update(nutrition_view="My Nutrition Progress"))
+
+    if nutrition_view == "Food Database":
+        st.markdown("### Food Database")
+        food_search = st.text_input("Search food", placeholder="Search chicken, rice, fruit...", key="nutrition_food_search")
+        food_category = st.selectbox("Category", ["All", *sorted({food["category"] for food in NUTRITION_FOODS.values()})], key="nutrition_database_category")
+        matching_foods = {
+            name: food
+            for name, food in NUTRITION_FOODS.items()
+            if (not food_search or food_search.lower() in name.lower())
+            and (food_category == "All" or food["category"] == food_category)
+        }
+        if matching_foods:
+            selected_food_name = st.selectbox("Choose a food", list(matching_foods), key="nutrition_selected_food")
+            selected_food = matching_foods[selected_food_name]
+            serving_amount = st.number_input(
+                f"Serving ({selected_food['unit']})",
+                min_value=1.0,
+                value=float(selected_food["serving"]),
+                step=10.0,
+                key="nutrition_serving_amount",
+            )
+            serving_multiplier = serving_amount / selected_food["serving"]
+            food_detail_cols = st.columns(4)
+            food_detail_cols[0].metric("Calories", f"{selected_food['calories'] * serving_multiplier:.0f} kcal")
+            food_detail_cols[1].metric("Protein", f"{selected_food['protein'] * serving_multiplier:.1f} g")
+            food_detail_cols[2].metric("Carbohydrates", f"{selected_food['carbs'] * serving_multiplier:.1f} g")
+            food_detail_cols[3].metric("Fat", f"{selected_food['fat'] * serving_multiplier:.1f} g")
+            st.caption(f"{selected_food_name} · {selected_food['category']} · values are approximate")
+        else:
+            st.info("No foods match that search and category.")
+
+    elif nutrition_view == "Meal Builder":
+        st.markdown("### 🍱 Build Your Meal")
+        st.caption("Choose foods and change the quantities to recalculate the meal automatically.")
+        meal_rows = []
+        for meal_index in range(3):
+            meal_columns = st.columns([2, 1])
+            with meal_columns[0]:
+                meal_food_name = st.selectbox("Food", ["No food", *NUTRITION_FOODS], key=f"meal_food_{meal_index}")
+            with meal_columns[1]:
+                meal_amount = st.number_input("Amount (g)", min_value=1.0, value=100.0, step=25.0, key=f"meal_amount_{meal_index}")
+            if meal_food_name != "No food":
+                meal_rows.append((NUTRITION_FOODS[meal_food_name], meal_amount))
+        meal_totals = {"calories": 0.0, "protein": 0.0, "carbs": 0.0, "fat": 0.0}
+        for meal_food, meal_amount in meal_rows:
+            meal_multiplier = meal_amount / meal_food["serving"]
+            for nutrient in meal_totals:
+                meal_totals[nutrient] += meal_food[nutrient] * meal_multiplier
+        meal_metrics = st.columns(4)
+        meal_metrics[0].metric("Total calories", f"{meal_totals['calories']:.0f} kcal")
+        meal_metrics[1].metric("Protein", f"{meal_totals['protein']:.1f} g")
+        meal_metrics[2].metric("Carbs", f"{meal_totals['carbs']:.1f} g")
+        meal_metrics[3].metric("Fat", f"{meal_totals['fat']:.1f} g")
+        if st.button("Save Meal", key="save_nutrition_meal"):
+            st.session_state["saved_nutrition_meal"] = meal_totals
+            st.success("Meal saved for this session.")
+
+    elif nutrition_view == "Nutrition Calculator":
+        st.markdown("### 🧮 Nutrition Calculator")
+        calculator_col1, calculator_col2 = st.columns(2)
+        with calculator_col1:
+            calculator_weight = st.number_input("Body weight (kg)", min_value=20.0, value=70.0, key="nutrition_calc_weight")
+            calculator_duration = st.number_input("Workout duration (minutes)", min_value=1.0, value=60.0, key="nutrition_calc_duration")
+        with calculator_col2:
+            calculator_intensity = st.selectbox("Workout intensity", ["Low", "Moderate", "High"], index=1, key="nutrition_calc_intensity")
+            intensity_factor = {"Low": 5.0, "Moderate": 7.0, "High": 9.0}[calculator_intensity]
+        estimated_energy = intensity_factor * 3.5 * calculator_weight / 200 * calculator_duration
+        calculator_results = st.columns(3)
+        calculator_results[0].metric("Estimated energy expenditure", f"{estimated_energy:,.0f} kcal")
+        calculator_results[1].metric("Suggested hydration", f"{calculator_duration / 60 * 0.5:.1f} L")
+        calculator_results[2].metric("Suggested protein range", f"{calculator_weight * 1.4:.0f}-{calculator_weight * 2:.0f} g")
+        st.caption("These are estimates for planning, not medical advice. Actual needs vary with training, climate, and individual health.")
+
+    elif nutrition_view == "My Nutrition Progress":
+        st.markdown("### 📊 My Nutrition Progress")
+        progress_by_date = {}
+        for entry in food_entries:
+            progress_by_date[entry["date"]] = progress_by_date.get(entry["date"], 0) + entry["calories"]
+        if progress_by_date:
+            progress_df = pd.DataFrame(
+                [{"date": date, "calories": calories} for date, calories in sorted(progress_by_date.items())]
+            ).tail(14).set_index("date")
+            st.line_chart(progress_df, y="calories")
+            st.caption(f"Showing the latest {len(progress_df)} logged day(s) against an estimated target of {calorie_target:,} kcal.")
+        else:
+            st.info("Add food entries to see your nutrition progress here.")
+
+    st.divider()
     st.markdown("### Daily nutrition planner")
     st.caption("Choose a sport-specific food or drink, or type any item and calorie value you want to track.")
     default_commitment = profile.get("nutrition_commitment") or f"I will choose food that supports my goal: {profile['goal']}"
