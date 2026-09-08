@@ -453,6 +453,20 @@ SPORT_OPTIONS = [
     "pilates",
 ]
 
+SPORT_PHOTOS = {
+    "volly": "https://images.unsplash.com/photo-1612872087720-bb876e2e67d1?auto=format&fit=crop&w=600&q=85",
+    "run": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=600&q=85",
+    "bycling": "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=600&q=85",
+    "basketball": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=600&q=85",
+    "swimming": "https://images.unsplash.com/photo-1530549387789-4c1017266635?auto=format&fit=crop&w=600&q=85",
+    "football": "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?auto=format&fit=crop&w=600&q=85",
+    "badminton": "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?auto=format&fit=crop&w=600&q=85",
+    "weight lifting": "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=600&q=85",
+    "hocky": "https://images.unsplash.com/photo-1515703407324-5f753afd8be8?auto=format&fit=crop&w=600&q=85",
+    "yoga": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=85",
+    "pilates": "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=600&q=85",
+}
+
 DATABASE_PATH = "bioathletic.db"
 
 FOOD_PRESETS = {
@@ -1085,7 +1099,10 @@ today_iso = datetime.now().date().isoformat()
 today_food_entries = [entry for entry in food_entries if entry["date"] == today_iso]
 today_calories = sum(entry["calories"] for entry in today_food_entries)
 
-profile_photo = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400&q=80"
+profile_photo = SPORT_PHOTOS.get(
+    profile["sport"].strip().lower(),
+    "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=400&q=80",
+)
 profile_col, leaderboard_col = st.columns([1.4, 1.2])
 
 with profile_col:
@@ -1246,16 +1263,26 @@ with physics_tab:
 
 with chemistry_tab:
     st.markdown(f"### {sport_name} chemistry")
-    st.caption("Estimate water and sodium replacement from this sport session.")
-    body_weight = st.number_input("Body weight (kg)", min_value=20.0, value=float(profile["height"] / 2.4), key="chem_weight")
+    st.caption("Measure your own sweat loss instead of guessing it.")
+    st.info(
+        "How to measure: weigh yourself before and after training in similar clothing, record every drink, "
+        "and record urine during the session. A 1 kg body-mass change is approximately 1 L of fluid."
+    )
+    body_weight = st.number_input("Body weight before (kg)", min_value=20.0, value=70.0, key="chem_weight_before")
+    post_weight = st.number_input("Body weight after (kg)", min_value=20.0, value=69.0, key="chem_weight_after")
     session_minutes = st.number_input("Session duration (minutes)", min_value=1.0, value=60.0, key="chem_duration")
-    sweat_rate = st.number_input("Sweat loss (L/hour)", min_value=0.0, value=0.8, key="chem_sweat_rate")
-    sweat_loss = sweat_rate * session_minutes / 60
+    fluid_intake = st.number_input("Fluid consumed (L)", min_value=0.0, value=0.5, key="chem_fluid_intake")
+    urine_loss = st.number_input("Urine passed during session (L)", min_value=0.0, value=0.0, key="chem_urine_loss")
+    body_mass_loss = max(0.0, body_weight - post_weight)
+    sweat_loss = body_mass_loss + fluid_intake - urine_loss
+    sweat_rate = sweat_loss / (session_minutes / 60)
     fluid_need = sweat_loss * 1.25
     sodium_need = sweat_loss * 800
+    st.metric("Estimated sweat loss", f"{sweat_loss:.2f} L")
+    st.metric("Sweat rate", f"{sweat_rate:.2f} L/hour")
     st.metric("Fluid replacement", f"{fluid_need:.2f} L")
     st.metric("Estimated sodium replacement", f"{sodium_need:.0f} mg")
-    st.caption("Formula: sweat loss = rate × duration; replacement target = 125% of loss; sodium estimate = 800 mg/L.")
+    st.caption("Formula: sweat loss = pre-weight − post-weight + fluid consumed − urine; replacement target = 125% of loss.")
     render_assessment("Session chemistry ready", f"Plan fluids and electrolytes around your {sport_name} session.", good=True)
 
 with biology_tab:
