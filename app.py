@@ -1091,6 +1091,17 @@ NUTRITION_FOODS.update(
     }
 )
 
+NUTRITION_DRINKS = {
+    name: details
+    for name, details in NUTRITION_FOODS.items()
+    if details["category"] == "Drink"
+}
+NUTRITION_FOOD_ITEMS = {
+    name: details
+    for name, details in NUTRITION_FOODS.items()
+    if details["category"] != "Drink"
+}
+
 SPORT_FOOD_ADDITIONS = {
     "volly": {
         "Volleyball fuel": {"Banana": 100, "Rice bowl with chicken": 520, "Yogurt and granola": 240},
@@ -2084,11 +2095,7 @@ with food_tab:
             horizontal=True,
             key="nutrition_database_item_type",
         )
-        database_items = {
-            name: details
-            for name, details in NUTRITION_FOODS.items()
-            if (details["category"] == "Drink") == (database_item_type == "Drinks")
-        }
+        database_items = NUTRITION_DRINKS if database_item_type == "Drinks" else NUTRITION_FOOD_ITEMS
         database_key = database_item_type.lower()
         food_search = st.text_input(
             "Search food or drink",
@@ -2164,11 +2171,11 @@ with food_tab:
         for meal_index in range(3):
             meal_columns = st.columns([2, 1])
             with meal_columns[0]:
-                meal_food_name = st.selectbox("Food", ["No food", *NUTRITION_FOODS], key=f"meal_food_{meal_index}")
+                meal_food_name = st.selectbox("Food", ["No food", *NUTRITION_FOOD_ITEMS], key=f"meal_food_{meal_index}")
             with meal_columns[1]:
                 meal_amount = st.number_input("Amount (g)", min_value=1.0, value=100.0, step=25.0, key=f"meal_amount_{meal_index}")
             if meal_food_name != "No food":
-                meal_rows.append((NUTRITION_FOODS[meal_food_name], meal_amount))
+                meal_rows.append((NUTRITION_FOOD_ITEMS[meal_food_name], meal_amount))
         meal_totals = {"calories": 0.0, "protein": 0.0, "carbs": 0.0, "fat": 0.0}
         for meal_food, meal_amount in meal_rows:
             meal_multiplier = meal_amount / meal_food["serving"]
@@ -2291,8 +2298,7 @@ with food_tab:
                     ).strip().lower()
                     matching_foods = {
                         name: details
-                        for name, details in NUTRITION_FOODS.items()
-                        if details["category"] != "Drink"
+                        for name, details in NUTRITION_FOOD_ITEMS.items()
                         if not food_search or food_search in name.lower()
                     }
                     if not matching_foods:
@@ -2326,11 +2332,7 @@ with food_tab:
                         placeholder="Try water, milk, coffee, smoothie...",
                         key=f"drink_tracker_search_{username}",
                     ).strip().lower()
-                    drink_library = {
-                        name: details
-                        for name, details in NUTRITION_FOODS.items()
-                        if details["category"] == "Drink"
-                    }
+                    drink_library = NUTRITION_DRINKS
                     matching_drinks = {
                         name: details
                         for name, details in drink_library.items()
