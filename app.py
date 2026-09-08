@@ -877,6 +877,202 @@ NUTRITION_FOODS = {
     "Tempeh": {"category": "Plant protein", "serving": 100, "unit": "g", "calories": 195, "protein": 19.9, "carbs": 7.6, "fat": 11.4},
 }
 
+
+for food_category, food_items in FOOD_CATEGORY_GROUPS.items():
+    for food_name, food_calories in food_items.items():
+        NUTRITION_FOODS.setdefault(
+            food_name,
+            {
+                "category": food_category,
+                "serving": 1,
+                "unit": "serving",
+                "calories": food_calories,
+                "protein": 0.0,
+                "carbs": 0.0,
+                "fat": 0.0,
+            },
+        )
+
+
+def drink_item(serving: int, calories: int, protein: float = 0.0, carbs: float = 0.0, fat: float = 0.0) -> dict:
+    return {
+        "category": "Drink",
+        "serving": serving,
+        "unit": "ml",
+        "calories": calories,
+        "protein": protein,
+        "carbs": carbs,
+        "fat": fat,
+    }
+
+
+def food_item(serving: int, calories: int, unit: str = "g") -> dict:
+    return {
+        "category": "Other",
+        "serving": serving,
+        "unit": unit,
+        "calories": calories,
+        "protein": 0.0,
+        "carbs": 0.0,
+        "fat": 0.0,
+    }
+
+
+for food_category, food_items in {
+    "Protein": {
+        "Ground beef": 250, "Sirloin steak": 206, "Beef tenderloin": 200,
+        "Beef liver": 135, "Pork loin": 190, "Pork tenderloin": 143,
+        "Lean pork": 200, "Goat meat": 143, "Venison": 158, "Bison": 143,
+    },
+    "Seafood & meat": {
+        "Sardines": 208, "Mackerel": 205, "Tilapia": 128, "Haddock": 90,
+        "Halibut": 111, "Trout": 148, "Snapper": 128, "Anchovies": 131,
+        "Prawns": 99, "Lobster": 89, "Scallops": 69, "Mussels": 86,
+        "Oysters": 68, "Squid": 92,
+    },
+    "Eggs & dairy": {
+        "1 large egg": 72, "Egg white": 52, "Skyr": 63, "Cottage cheese": 98,
+        "Low-fat milk": 42, "Kefir (100 g)": 50, "Cheddar cheese": 403,
+        "Mozzarella": 280, "Parmesan": 431, "Ricotta": 174,
+    },
+    "Plant protein": {
+        "Soybeans": 173, "Kidney beans, cooked": 127, "Pinto beans, cooked": 143,
+        "Split peas, cooked": 118,
+    },
+    "Carbohydrate & grains": {
+        "Jasmine rice, cooked": 130, "Basmati rice, cooked": 130, "Whole-grain pasta, cooked": 149,
+        "White bread": 266, "Bagel": 275, "Tortilla": 310, "Couscous, cooked": 112,
+        "Barley, cooked": 123, "Corn": 86, "Corn tortilla": 218,
+        "Rice noodles, cooked": 109, "Soba noodles, cooked": 99, "Granola": 450,
+    },
+    "Fruit": {
+        "Cantaloupe": 34, "Raspberries": 52, "Blackberries": 43, "Kiwi": 61,
+        "Guava": 68, "Passion fruit": 97, "Dragon fruit": 57, "Pear": 57,
+        "Peach": 39, "Plum": 46, "Cherries": 63, "Dates": 282,
+        "Raisins": 299, "Dried apricots": 241,
+    },
+    "Healthy fats": {
+        "Almonds": 579, "Walnuts": 654, "Cashews": 553, "Pistachios": 562,
+        "Peanuts": 567, "Peanut butter": 588, "Almond butter": 614,
+        "Tahini": 595, "Chia seeds": 486, "Flax seeds": 534,
+        "Pumpkin seeds": 559, "Sunflower seeds": 584, "Sesame seeds": 573,
+        "Olive oil": 884, "Canola oil": 884, "Fatty fish": 200,
+    },
+    "Vegetables": {
+        "Kale": 49, "Lettuce": 15, "Cabbage": 25, "Bok choy": 13,
+        "Green beans": 31, "Asparagus": 20, "Eggplant": 25, "Onion": 40,
+        "Garlic": 149, "Peas": 81, "Beetroot": 43, "Pumpkin": 26,
+        "Squash": 40,
+    },
+    "Indonesian foods": {
+        "Nasi putih": 130, "Nasi merah": 110, "Ayam bakar": 225,
+        "Ayam panggang": 190, "Ayam rebus": 165, "Ikan bakar": 200,
+        "Tempe": 195, "Tahu": 90, "Telur": 72, "Edamame": 120,
+        "Sayur asem": 75, "Gado-gado": 400, "Pecel": 400, "Capcay": 225,
+        "Soto ayam": 325, "Rawon": 500, "Urap": 200, "Kentang": 77,
+        "Ubi": 100, "Singkong": 160, "Pisang": 89, "Pepaya": 43,
+        "Mangga": 60, "Jambu": 68, "Rambutan": 68, "Salak": 80,
+        "Nangka": 95, "Durian": 147,
+    },
+    "Food limit": {
+        "French fries": 310, "Fried chicken": 275, "Chicken nuggets": 290,
+        "Burger": 600, "Pizza": 325, "Hot dog": 325, "Fried fish": 250,
+        "Onion rings": 350, "Potato chips": 530, "Crackers": 465,
+        "Cookies": 500, "Candy": 425, "Chocolate bar": 250, "Donut": 275,
+        "Cake": 375, "Ice cream": 225, "Sausage": 300, "Bacon": 500,
+        "Salami": 400, "Pepperoni": 450, "Spam": 300, "Processed cheese": 300,
+        "Instant noodles": 425,
+    },
+}.items():
+    for food_name, food_calories in food_items.items():
+        NUTRITION_FOODS.setdefault(food_name, food_item(100, food_calories))
+
+
+for food_name, food_calories in {
+    "Nasi uduk": 375, "Nasi kuning": 325, "Bubur ayam": 325, "Ikan pepes": 200,
+    "Ikan goreng": 250, "Sayur asem (1 bowl)": 75, "Gado-gado (1 serving)": 400,
+    "Pecel (1 serving)": 400, "Capcay (1 serving)": 225, "Soto ayam (1 bowl)": 325,
+    "Rawon (1 bowl)": 500, "Urap (1 serving)": 200,
+}.items():
+    NUTRITION_FOODS.setdefault(food_name, food_item(1, food_calories, "serving"))
+
+
+NUTRITION_FOODS.update(
+    {
+        "Water": drink_item(250, 0),
+        "Sparkling water": drink_item(250, 0),
+        "Mineral water": drink_item(250, 0),
+        "Unsweetened tea": drink_item(250, 2),
+        "Unsweetened green tea": drink_item(250, 2),
+        "Unsweetened black tea": drink_item(250, 2),
+        "Black coffee": drink_item(240, 5),
+        "Espresso": drink_item(30, 2),
+        "Americano": drink_item(240, 5),
+        "Herbal tea": drink_item(250, 2),
+        "Lemon water, no sugar": drink_item(250, 5, carbs=1.2),
+        "Whole milk": drink_item(250, 150, protein=8.0, carbs=12.0, fat=8.0),
+        "2% milk": drink_item(250, 120, protein=8.0, carbs=12.0, fat=5.0),
+        "1% milk": drink_item(250, 100, protein=8.0, carbs=12.0, fat=2.5),
+        "Skim milk": drink_item(250, 85, protein=8.0, carbs=12.0, fat=0.3),
+        "Soy milk, unsweetened": drink_item(250, 80, protein=7.0, carbs=4.0, fat=4.0),
+        "Almond milk, unsweetened": drink_item(250, 35, protein=1.0, carbs=2.0, fat=2.5),
+        "Oat milk": drink_item(250, 120, protein=3.0, carbs=16.0, fat=5.0),
+        "Coconut milk beverage": drink_item(250, 45, carbs=2.0, fat=4.0),
+        "Kefir": drink_item(250, 150, protein=8.0, carbs=12.0, fat=7.0),
+        "Chocolate milk": drink_item(250, 200, protein=8.0, carbs=30.0, fat=5.0),
+        "Strawberry milk": drink_item(250, 200, protein=8.0, carbs=30.0, fat=5.0),
+        "Electrolyte drink, low calorie": drink_item(500, 25, carbs=6.0),
+        "Sports drink": drink_item(500, 120, carbs=30.0),
+        "Isotonic drink": drink_item(500, 125, carbs=31.0),
+        "Coconut water (250 ml)": drink_item(250, 45, carbs=11.0),
+        "Coconut water (500 ml)": drink_item(500, 90, carbs=22.0),
+        "Recovery drink": drink_item(300, 200, protein=15.0, carbs=25.0),
+        "Protein shake": drink_item(300, 225, protein=30.0, carbs=12.0, fat=5.0),
+        "Whey protein + water": drink_item(300, 125, protein=24.0, carbs=3.0, fat=2.0),
+        "Protein shake + milk": drink_item(300, 275, protein=32.0, carbs=18.0, fat=8.0),
+        "Orange juice": drink_item(250, 110, carbs=26.0),
+        "Apple juice": drink_item(250, 115, carbs=28.0),
+        "Grape juice": drink_item(250, 150, carbs=37.0),
+        "Pineapple juice": drink_item(250, 130, carbs=32.0),
+        "Mango juice": drink_item(250, 145, carbs=35.0),
+        "Tomato juice": drink_item(250, 40, carbs=9.0),
+        "Watermelon juice": drink_item(250, 70, carbs=17.0),
+        "Lemon juice, unsweetened": drink_item(250, 20, carbs=6.0),
+        "Mixed fruit juice": drink_item(250, 140, carbs=34.0),
+        "Fruit smoothie": drink_item(350, 300, carbs=55.0, protein=5.0),
+        "Latte": drink_item(350, 185, protein=10.0, carbs=15.0, fat=8.0),
+        "Cappuccino": drink_item(250, 125, protein=7.0, carbs=10.0, fat=5.0),
+        "Flat white": drink_item(250, 150, protein=8.0, carbs=12.0, fat=7.0),
+        "Mocha": drink_item(350, 325, protein=10.0, carbs=42.0, fat=12.0),
+        "Caramel latte": drink_item(350, 325, protein=9.0, carbs=45.0, fat=10.0),
+        "Vanilla latte": drink_item(350, 275, protein=9.0, carbs=38.0, fat=8.0),
+        "Iced coffee, unsweetened": drink_item(350, 15),
+        "Iced latte": drink_item(350, 200, protein=10.0, carbs=18.0, fat=8.0),
+        "Frappuccino-style coffee": drink_item(350, 375, protein=7.0, carbs=55.0, fat=14.0),
+        "Cola": drink_item(330, 140, carbs=35.0),
+        "Lemon-lime soda": drink_item(330, 140, carbs=36.0),
+        "Root beer": drink_item(330, 150, carbs=39.0),
+        "Ginger ale": drink_item(330, 130, carbs=33.0),
+        "Tonic water": drink_item(330, 120, carbs=32.0),
+        "Diet cola": drink_item(330, 5),
+        "Zero-sugar soda": drink_item(330, 5),
+        "Sweetened iced tea": drink_item(500, 200, carbs=50.0),
+        "Lemonade": drink_item(250, 125, carbs=31.0),
+        "Milk tea": drink_item(500, 325, protein=7.0, carbs=55.0, fat=8.0),
+        "Brown sugar milk tea": drink_item(500, 425, protein=7.0, carbs=75.0, fat=8.0),
+        "Thai tea": drink_item(400, 275, protein=5.0, carbs=40.0, fat=10.0),
+        "Matcha latte": drink_item(400, 240, protein=10.0, carbs=28.0, fat=8.0),
+        "Fruit tea": drink_item(500, 175, carbs=43.0),
+        "Bubble tea with tapioca pearls": drink_item(500, 475, protein=5.0, carbs=85.0, fat=10.0),
+        "Hot chocolate": drink_item(250, 215, protein=8.0, carbs=32.0, fat=7.0),
+        "Chocolate milkshake": drink_item(400, 550, protein=12.0, carbs=70.0, fat=20.0),
+        "Vanilla milkshake": drink_item(400, 550, protein=12.0, carbs=70.0, fat=20.0),
+        "Strawberry milkshake": drink_item(400, 550, protein=12.0, carbs=70.0, fat=20.0),
+        "Ice cream float": drink_item(350, 350, protein=5.0, carbs=50.0, fat=14.0),
+        "Eggnog": drink_item(250, 285, protein=8.0, carbs=25.0, fat=15.0),
+    }
+)
+
 SPORT_FOOD_ADDITIONS = {
     "volly": {
         "Volleyball fuel": {"Banana": 100, "Rice bowl with chicken": 520, "Yogurt and granola": 240},
@@ -1566,19 +1762,6 @@ food_note_col.caption(
     "Open Nutrition to set your commitment, add meals, and calculate your daily intake."
 )
 
-st.markdown(
-    """
-    <div class="nutrition-dashboard-card">
-        <h3>🥗 Commitment Nutrition</h3>
-        <p>Build healthier eating habits and fuel your performance.</p>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
-if st.button("Explore Nutrition →", key="explore_nutrition", type="secondary"):
-    st.session_state["nutrition_view"] = "Food Tracker"
-    st.rerun()
-
 progress = min(summary["monthly_hours"] / max(profile["weekly_target"], 1), 1.0)
 st.subheader("Progress toward goal")
 st.progress(
@@ -1880,7 +2063,34 @@ with food_tab:
             and (food_category == "All" or food["category"] == food_category)
         }
         if matching_foods:
-            selected_food_name = st.selectbox("Choose a food", list(matching_foods), key="nutrition_selected_food")
+            grocery_df = pd.DataFrame(
+                [
+                    {
+                        "Food / drink": name,
+                        "Category": details["category"],
+                        "Serving": f"{details['serving']} {details['unit']}",
+                        "Calories (kcal)": details["calories"],
+                    }
+                    for name, details in matching_foods.items()
+                ]
+            )
+            grocery_selection = st.dataframe(
+                grocery_df,
+                hide_index=True,
+                use_container_width=True,
+                on_select="rerun",
+                selection_mode="single-row",
+                key="nutrition_grocery_table",
+            )
+            selected_rows = grocery_selection.selection.rows
+            selected_food_names = list(matching_foods)
+            selected_food_index = selected_rows[0] if selected_rows else 0
+            selected_food_name = st.selectbox(
+                "Choose a food or drink",
+                selected_food_names,
+                index=selected_food_index,
+                key="nutrition_selected_food",
+            )
             selected_food = matching_foods[selected_food_name]
             serving_amount = st.number_input(
                 f"Serving ({selected_food['unit']})",
@@ -2034,6 +2244,7 @@ with food_tab:
                     matching_foods = {
                         name: details
                         for name, details in NUTRITION_FOODS.items()
+                        if details["category"] != "Drink"
                         if not food_search or food_search in name.lower()
                     }
                     if not matching_foods:
@@ -2057,7 +2268,8 @@ with food_tab:
                         custom_category = selected_food["category"]
                         selected_macros = selected_food
                         st.caption(
-                            f"{food_name} · {selected_food['calories']} kcal per 100 {selected_food['unit']} · "
+                            f"{food_name} · {selected_food['calories']} kcal per "
+                            f"{selected_food['serving']} {selected_food['unit']} · "
                             f"{selected_food['category']}"
                         )
                 else:
@@ -2067,13 +2279,13 @@ with food_tab:
                         key=f"drink_tracker_search_{username}",
                     ).strip().lower()
                     drink_library = {
-                        item: calories
-                        for drink_group in DRINK_PRESETS.values()
-                        for item, calories in drink_group.items()
+                        name: details
+                        for name, details in NUTRITION_FOODS.items()
+                        if details["category"] == "Drink"
                     }
                     matching_drinks = {
-                        name: calories
-                        for name, calories in drink_library.items()
+                        name: details
+                        for name, details in drink_library.items()
                         if not drink_search or drink_search in name.lower()
                     }
                     if not matching_drinks:
@@ -2084,14 +2296,21 @@ with food_tab:
                         drink_name = st.radio(
                             "Choose a drink from the list",
                             list(matching_drinks),
-                            format_func=lambda name: f"{name} · {matching_drinks[name]} kcal / serving",
+                            format_func=lambda name: (
+                                f"{name} · {matching_drinks[name]['calories']} kcal / "
+                                f"{matching_drinks[name]['serving']} {matching_drinks[name]['unit']}"
+                            ),
                             key=f"food_tracker_drink_{username}",
                         )
                         food_name = drink_name
-                        calories_per_serving = matching_drinks[drink_name]
-                        st.caption(f"{drink_name} · {calories_per_serving} kcal per serving · Drink")
+                        selected_drink = matching_drinks[drink_name]
+                        calories_per_serving = selected_drink["calories"]
+                        selected_macros = selected_drink
+                        st.caption(
+                            f"{drink_name} · {calories_per_serving} kcal per "
+                            f"{selected_drink['serving']} {selected_drink['unit']} · Drink"
+                        )
                     custom_category = "Drink"
-                    selected_macros = None
 
             servings = st.number_input(
                 "Amount / servings",
