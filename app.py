@@ -2223,6 +2223,12 @@ with food_tab:
     st.divider()
     st.markdown("### Nutrition Tracker")
     st.caption("Choose a food or drink, or enter any item and calorie value you want to track.")
+    if nutrition_view == "Food Database":
+        database_mode = st.session_state.get("nutrition_database_item_type", "Food")
+        tracker_mode = "Drink" if database_mode == "Drinks" else "Food"
+        tracker_mode_key = f"preset_item_type_{username}"
+        if st.session_state.get(tracker_mode_key) != tracker_mode:
+            st.session_state[tracker_mode_key] = tracker_mode
     stored_commitment = profile.get("nutrition_commitment") or ""
     if stored_commitment.startswith("I will choose food that supports my goal:"):
         stored_commitment = stored_commitment.replace("I will choose food", "I will choose fuel", 1)
@@ -2331,7 +2337,7 @@ with food_tab:
                         )
                 else:
                     drink_search = st.text_input(
-                        "Search drinks",
+                        "Search individual drinks",
                         placeholder="Try water, milk, coffee, smoothie...",
                         key=f"drink_tracker_search_{username}",
                     ).strip().lower()
