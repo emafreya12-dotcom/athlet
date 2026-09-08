@@ -2082,7 +2082,7 @@ with food_tab:
 
     st.markdown("### What would you like to do?")
     action_col1, action_col2, action_col3, action_col4 = st.columns(4)
-    action_col1.button("🍎 Find Food", key="nutrition_find_food", on_click=lambda: st.session_state.update(nutrition_view="Food Database"))
+    action_col1.button("🍎 Browse Nutrition", key="nutrition_find_food", on_click=lambda: st.session_state.update(nutrition_view="Food Database"))
     action_col2.button("🍱 Build a Meal", key="nutrition_build_meal", on_click=lambda: st.session_state.update(nutrition_view="Meal Builder"))
     action_col3.button("🧮 Calculate Nutrition", key="nutrition_calculate", on_click=lambda: st.session_state.update(nutrition_view="Nutrition Calculator"))
     action_col4.button("📊 View Progress", key="nutrition_progress", on_click=lambda: st.session_state.update(nutrition_view="Nutrition Progress"))
@@ -2221,9 +2221,12 @@ with food_tab:
             st.info("Add food entries to see your nutrition progress here.")
 
     st.divider()
-    st.markdown("### Food Tracker")
-    st.caption("Choose a sport-specific food or drink, or type any item and calorie value you want to track.")
-    default_commitment = profile.get("nutrition_commitment") or f"I will choose food that supports my goal: {profile['goal']}"
+    st.markdown("### Nutrition Tracker")
+    st.caption("Choose a food or drink, or enter any item and calorie value you want to track.")
+    stored_commitment = profile.get("nutrition_commitment") or ""
+    if stored_commitment.startswith("I will choose food that supports my goal:"):
+        stored_commitment = stored_commitment.replace("I will choose food", "I will choose fuel", 1)
+    default_commitment = stored_commitment or f"I will choose fuel that supports my goal: {profile['goal']}"
     commitment_state_key = f"nutrition_commitment_input_{username}"
     if commitment_state_key not in st.session_state:
         st.session_state[commitment_state_key] = default_commitment
@@ -2266,7 +2269,7 @@ with food_tab:
         )
         with st.form("food_item_form"):
             st.markdown(
-                '<div class="food-entry-panel"><div class="food-entry-kicker">Build your plate</div><div class="food-entry-title">What are you adding today?</div>',
+                '<div class="food-entry-panel"><div class="food-entry-kicker">Add nutrition</div><div class="food-entry-title">What are you adding today?</div>',
                 unsafe_allow_html=True,
             )
             if input_mode == "Input calories myself":
@@ -2309,11 +2312,11 @@ with food_tab:
                         selected_macros = None
                     else:
                         food_name = st.radio(
-                            "Choose a food from the list",
+                            "Choose a food",
                             list(matching_foods),
                             format_func=lambda name: (
                                 f"{name} · {matching_foods[name]['calories']} kcal / "
-                                f"100 {matching_foods[name]['unit']}"
+                                f"{matching_foods[name]['serving']} {matching_foods[name]['unit']}"
                             ),
                             key=f"food_tracker_food_{username}",
                         )
