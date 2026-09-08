@@ -17,6 +17,11 @@ st.markdown(
             background: #f5f7fa;
             color: #000000;
         }
+        .stApp p,
+        .stApp label,
+        .stApp [data-testid="stMarkdownContainer"] {
+            color: #000000;
+        }
         .block-container {
             padding-top: 1.5rem;
             padding-bottom: 2rem;
@@ -121,6 +126,26 @@ st.markdown(
             color: #000000;
             border-color: #94a3b8;
         }
+        section[data-testid="stSidebar"] .st-key-logout_container button {
+            background: #dc2626;
+            color: #000000;
+            border-color: #b91c1c;
+        }
+        section[data-testid="stSidebar"] .st-key-logout_container button:hover {
+            background: #b91c1c;
+            color: #000000;
+        }
+        div[data-testid="stForm"] button[kind="primary"],
+        .stButton button[kind="primary"] {
+            background: #dc2626;
+            color: #000000;
+            border-color: #b91c1c;
+        }
+        div[data-testid="stForm"] button[kind="primary"]:hover,
+        .stButton button[kind="primary"]:hover {
+            background: #b91c1c;
+            color: #000000;
+        }
         .auth-page {
             max-width: 1120px;
             margin: 0 auto;
@@ -133,12 +158,12 @@ st.markdown(
             padding: 34px;
             border-radius: 24px;
             overflow: hidden;
-            background: linear-gradient(90deg, rgba(4, 18, 33, 0.9), rgba(4, 18, 33, 0.18)),
-                url("https://images.unsplash.com/photo-1502904550040-7534597429ae?auto=format&fit=crop&w=1600&q=85") center/cover;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.3)),
+                url("https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1600&q=85") center/cover;
             box-shadow: 0 20px 45px rgba(3, 12, 24, 0.4);
         }
         .auth-kicker {
-            color: #7ce5c7;
+            color: #000000;
             font-size: 0.82rem;
             font-weight: 800;
             letter-spacing: 0.14em;
@@ -147,7 +172,7 @@ st.markdown(
         .auth-title {
             max-width: 620px;
             margin: 8px 0;
-            color: #ffffff;
+            color: #000000;
             font-size: clamp(2.2rem, 5vw, 4.6rem);
             line-height: 0.98;
             font-weight: 850;
@@ -155,7 +180,7 @@ st.markdown(
         .auth-copy {
             max-width: 520px;
             margin: 0;
-            color: #e1f3fb;
+            color: #000000;
             font-size: 1.05rem;
         }
         .auth-choice {
@@ -743,9 +768,10 @@ with st.sidebar:
             save_workout(username, workouts[-1])
             st.success("Workout added.")
 
-    if st.button("Logout"):
-        st.session_state.current_user = None
-        st.rerun()
+    with st.container(key="logout_container"):
+        if st.button("Logout", use_container_width=True):
+            st.session_state.current_user = None
+            st.rerun()
 
 
 current_month = datetime.now().month
