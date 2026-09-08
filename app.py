@@ -985,16 +985,29 @@ def initialize_database():
             );
             """
         )
-        profile_columns = {
-            row["name"] for row in connection.execute("PRAGMA table_info(profiles)").fetchall()
-        }
-        if "email" not in profile_columns:
-            connection.execute("ALTER TABLE profiles ADD COLUMN email TEXT")
+        def ensure_profile_column(column_name: str, column_definition: str) -> bool:
+            profile_columns = {
+                row["name"] for row in connection.execute("PRAGMA table_info(profiles)").fetchall()
+            }
+            if column_name in profile_columns:
+                return False
+            try:
+                connection.execute(
+                    f"ALTER TABLE profiles ADD COLUMN {column_name} {column_definition}"
+                )
+            except sqlite3.OperationalError:
+                refreshed_columns = {
+                    row["name"] for row in connection.execute("PRAGMA table_info(profiles)").fetchall()
+                }
+                if column_name not in refreshed_columns:
+                    raise
+                return False
+            return True
+
+        if ensure_profile_column("email", "TEXT"):
             connection.execute("UPDATE profiles SET email = username WHERE email IS NULL OR email = ''")
-        if "height" not in profile_columns:
-            connection.execute("ALTER TABLE profiles ADD COLUMN height REAL NOT NULL DEFAULT 0")
-        if "nutrition_commitment" not in profile_columns:
-            connection.execute("ALTER TABLE profiles ADD COLUMN nutrition_commitment TEXT NOT NULL DEFAULT ''")
+        ensure_profile_column("height", "REAL NOT NULL DEFAULT 0")
+        ensure_profile_column("nutrition_commitment", "TEXT NOT NULL DEFAULT ''")
         demo = DEFAULT_PROFILES["demo"]
         connection.execute(
             """
