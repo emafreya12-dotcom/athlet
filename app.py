@@ -2043,9 +2043,13 @@ with food_tab:
                         custom_category = "Food"
                         selected_macros = None
                     else:
-                        food_name = st.selectbox(
-                            "Choose an individual food",
+                        food_name = st.radio(
+                            "Choose a food from the list",
                             list(matching_foods),
+                            format_func=lambda name: (
+                                f"{name} · {matching_foods[name]['calories']} kcal / "
+                                f"100 {matching_foods[name]['unit']}"
+                            ),
                             key=f"food_tracker_food_{username}",
                         )
                         selected_food = matching_foods[food_name]
@@ -2077,9 +2081,10 @@ with food_tab:
                         food_name = ""
                         calories_per_serving = 0
                     else:
-                        drink_name = st.selectbox(
-                            "Choose an individual drink",
+                        drink_name = st.radio(
+                            "Choose a drink from the list",
                             list(matching_drinks),
+                            format_func=lambda name: f"{name} · {matching_drinks[name]} kcal / serving",
                             key=f"food_tracker_drink_{username}",
                         )
                         food_name = drink_name
