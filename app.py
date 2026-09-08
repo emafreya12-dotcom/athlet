@@ -262,44 +262,47 @@ st.markdown(
             background: #ffffff;
         }
         section[data-testid="stSidebar"] button {
-            background: #ffffff;
-            color: #000000;
-            border: 1px solid #cbd5e1;
+            background: #d9f5e8;
+            color: #245b3a;
+            border: 1px solid #a9d9b8;
         }
         section[data-testid="stSidebar"] button:hover {
-            background: #f1f5f9;
-            color: #000000;
-            border-color: #94a3b8;
+            background: #b8e6c8;
+            color: #245b3a;
+            border-color: #79bd91;
         }
         section[data-testid="stSidebar"] .st-key-logout_container button {
-            background: #dc2626;
-            color: #000000;
-            border-color: #b91c1c;
+            background: #d9f5e8;
+            color: #245b3a;
+            border-color: #a9d9b8;
         }
         section[data-testid="stSidebar"] .st-key-logout_container button:hover {
-            background: #b91c1c;
-            color: #000000;
+            background: #b8e6c8;
+            color: #245b3a;
         }
         div[data-testid="stForm"] button[kind="primary"],
         .stButton button[kind="primary"] {
-            background: #dc2626;
-            color: #000000;
-            border-color: #b91c1c;
+            background: #d9f5e8;
+            color: #245b3a;
+            border-color: #a9d9b8;
         }
         div[data-testid="stForm"] button[kind="primary"]:hover,
         .stButton button[kind="primary"]:hover {
-            background: #b91c1c;
-            color: #000000;
+            background: #b8e6c8;
+            color: #245b3a;
+            border-color: #79bd91;
         }
-        div[data-testid="stForm"] button[kind="secondary"] {
-            background: #ffffff;
-            color: #000000;
-            border-color: #cbd5e1;
+        div[data-testid="stForm"] button[kind="secondary"],
+        .stButton button[kind="secondary"] {
+            background: #d9f5e8;
+            color: #245b3a;
+            border-color: #a9d9b8;
         }
-        div[data-testid="stForm"] button[kind="secondary"]:hover {
-            background: #f1f5f9;
-            color: #000000;
-            border-color: #94a3b8;
+        div[data-testid="stForm"] button[kind="secondary"]:hover,
+        .stButton button[kind="secondary"]:hover {
+            background: #b8e6c8;
+            color: #245b3a;
+            border-color: #79bd91;
         }
         .login-success-flash {
             position: fixed;
@@ -495,27 +498,29 @@ st.markdown(
             padding: 16px 18px;
             border: 0;
             border-radius: 3px;
-            color: #ffffff;
-            background: var(--auth-leaf-dark);
+            color: #245b3a;
+            background: #d9f5e8;
             font-size: 12px;
             font-weight: 700;
         }
         .auth-form-panel div[data-testid="stFormSubmitButton"] button:hover {
-            color: #ffffff;
-            background: var(--auth-leaf);
+            color: #245b3a;
+            background: #b8e6c8;
         }
         .auth-form-panel > div[data-testid="stButton"] button {
             margin-top: 23px;
-            padding: 0;
-            border: 0;
-            color: var(--auth-muted);
-            background: transparent;
+            padding: 10px 14px;
+            border: 1px solid #a9d9b8;
+            border-radius: 4px;
+            color: #245b3a;
+            background: #d9f5e8;
             font-size: 11px;
             font-weight: 700;
         }
         .auth-form-panel > div[data-testid="stButton"] button:hover {
-            color: var(--auth-leaf-dark);
-            text-decoration: underline;
+            color: #245b3a;
+            background: #b8e6c8;
+            border-color: #79bd91;
         }
         @media (max-width: 850px) {
             .auth-reference-grid { min-height: auto; }
