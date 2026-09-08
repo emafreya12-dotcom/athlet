@@ -2,6 +2,7 @@ import calendar
 import hashlib
 import hmac
 import math
+import re
 import secrets
 import sqlite3
 from datetime import datetime
@@ -392,7 +393,7 @@ st.markdown(
 
 DEFAULT_PROFILES = {
     "demo": {
-        "username": "demo",
+        "username": "demo@example.com",
         "password": "demo123",
         "name": "Maria",
         "sport": "Swimming",
@@ -590,6 +591,10 @@ def authenticate(username: str, password: str) -> bool:
             (username.strip(),),
         ).fetchone()
     return bool(row and password_matches(password, row["password_hash"]))
+
+
+def is_valid_email(email: str) -> bool:
+    return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", email.strip()))
 
 
 def create_account(username: str, password: str, name: str, sport: str, goal: str, weekly_target: float):
@@ -894,27 +899,25 @@ if st.session_state.current_user is None:
             st.rerun()
         st.subheader("Create your athlete profile")
         with st.form("signup_form"):
-            new_username = st.text_input("New username")
+            new_email = st.text_input("Email address", placeholder="you@example.com")
             new_password = st.text_input("New password", type="password")
-            new_name = st.text_input("Full name")
-            new_sport = st.text_input("Sport")
-            new_goal = st.text_input("Goal")
-            new_target = st.number_input("Weekly target (hours)", min_value=0.0, step=0.5, value=5.0)
-            signup_submitted = st.form_submit_button("Create", type="secondary", use_container_width=True)
+            signup_submitted = st.form_submit_button("Create account", type="secondary", use_container_width=True)
             if signup_submitted:
-                if not new_username or not new_password:
-                    st.warning("Username and password are required.")
+                if not new_email or not new_password:
+                    st.warning("Email address and password are required.")
+                elif not is_valid_email(new_email):
+                    st.warning("Enter a valid email address.")
                 elif create_account(
-                    new_username,
+                    new_email,
                     new_password,
-                    new_name or new_username,
-                    new_sport or "General fitness",
-                    new_goal or "General fitness",
-                    float(new_target),
+                    new_email.split("@", 1)[0],
+                    "General fitness",
+                    "General fitness",
+                    5.0,
                 ) is False:
-                    st.warning("That username already exists.")
+                    st.warning("That email address is already registered.")
                 else:
-                    st.session_state.current_user = new_username.strip()
+                    st.session_state.current_user = new_email.strip()
                     st.session_state.show_success_flash = True
                     st.success("Profile created successfully.")
                     st.rerun()
