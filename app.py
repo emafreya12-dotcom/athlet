@@ -944,6 +944,26 @@ def food_item(serving: int, calories: int, unit: str = "g", category: str = "Oth
     }
 
 
+def food_item_with_macros(
+    serving: int,
+    calories: int,
+    protein: float,
+    carbs: float,
+    fat: float,
+    unit: str = "serving",
+    category: str = "Other",
+) -> dict:
+    return {
+        "category": category,
+        "serving": serving,
+        "unit": unit,
+        "calories": calories,
+        "protein": protein,
+        "carbs": carbs,
+        "fat": fat,
+    }
+
+
 for food_category, food_items in {
     "Protein": {
         "Ground beef": 250, "Sirloin steak": 206, "Beef tenderloin": 200,
@@ -1102,6 +1122,83 @@ NUTRITION_FOODS.update(
     }
 )
 
+
+LOCALIZED_NUTRITION_ITEMS = {
+    "Burger (1 porsi)": (310, 14, 28, 15, "Junk food"),
+    "Pizza (1 slice)": (298, 12, 30, 14, "Junk food"),
+    "Mie instan (1 bungkus)": (435, 8, 55, 18, "Junk food"),
+    "Kentang goreng (1 porsi)": (275, 3, 35, 14, "Junk food"),
+    "Nugget ayam (6 pc)": (250, 12, 18, 15, "Junk food"),
+    "Donat (1 buah)": (200, 4, 25, 10, "Junk food"),
+    "Hot dog (1 buah)": (270, 10, 20, 16, "Junk food"),
+    "Keripik kentang (1 bungkus kecil)": (175, 2, 18, 12, "Junk food"),
+    "Ayam goreng tepung (1 potong)": (350, 25, 15, 22, "Junk food"),
+    "Sosis goreng (1 buah)": (150, 6, 5, 12, "Junk food"),
+    "Nasi putih (1 porsi)": (180, 4, 40, 0.5, "Makanan Indonesia"),
+    "Nasi goreng (1 porsi)": (350, 10, 45, 14, "Makanan Indonesia"),
+    "Mie goreng (1 porsi)": (400, 12, 50, 16, "Makanan Indonesia"),
+    "Sate ayam (10 tusuk)": (450, 40, 15, 25, "Makanan Indonesia"),
+    "Rendang (1 porsi)": (350, 25, 10, 22, "Makanan Indonesia"),
+    "Gado-gado (1 porsi)": (325, 12, 30, 18, "Makanan Indonesia"),
+    "Ketoprak (1 porsi)": (275, 10, 35, 12, "Makanan Indonesia"),
+    "Bakso (1 mangkok)": (300, 20, 35, 10, "Makanan Indonesia"),
+    "Soto ayam (1 mangkok)": (250, 18, 20, 10, "Makanan Indonesia"),
+    "Rawon (1 mangkok)": (300, 20, 22, 12, "Makanan Indonesia"),
+    "Pecel lele (1 porsi)": (450, 28, 40, 22, "Makanan Indonesia"),
+    "Ayam penyet (1 porsi)": (600, 35, 50, 32, "Makanan Indonesia"),
+    "Martabak telor (1 porsi)": (525, 18, 40, 30, "Makanan Indonesia"),
+    "Martabak manis (1 potong)": (350, 6, 55, 12, "Makanan Indonesia"),
+    "Pisang goreng (3 buah)": (225, 2, 30, 10, "Makanan Indonesia"),
+    "Risol (1 buah)": (175, 4, 20, 8, "Makanan Indonesia"),
+    "Pastel (1 buah)": (175, 4, 18, 9, "Makanan Indonesia"),
+    "Lemper (1 buah)": (165, 5, 25, 5, "Makanan Indonesia"),
+    "Onde-onde (1 buah)": (150, 3, 20, 7, "Makanan Indonesia"),
+    "Klepon (1 buah)": (90, 1, 18, 2, "Makanan Indonesia"),
+    "Nasi merah (1 porsi)": (150, 4, 32, 1, "Real food"),
+    "Oatmeal (1 porsi)": (150, 5, 27, 3, "Real food"),
+    "Dada ayam bakar (100g)": (165, 31, 0, 3.5, "Real food"),
+    "Ikan salmon panggang (100g)": (200, 22, 0, 13, "Real food"),
+    "Ikan tuna (100g)": (130, 28, 0, 1.5, "Real food"),
+    "Telur rebus (1 butir)": (78, 6, 0.5, 5.5, "Real food"),
+    "Telur dadar (1 butir)": (100, 7, 1, 7, "Real food"),
+    "Tempe goreng (100g)": (200, 20, 15, 10, "Real food"),
+    "Tahu goreng (100g)": (150, 15, 5, 8, "Real food"),
+    "Brokoli rebus (100g)": (35, 3, 6, 0.5, "Real food"),
+    "Bayam rebus (100g)": (23, 3, 4, 0.3, "Real food"),
+    "Wortel mentah (100g)": (41, 1, 9, 0.2, "Real food"),
+    "Kentang rebus (1 buah)": (80, 2, 18, 0.1, "Real food"),
+    "Ubi jalar panggang (1 buah)": (125, 2, 28, 0.2, "Real food"),
+    "Alpukat (1/2 buah)": (160, 2, 8, 15, "Real food"),
+    "Pisang (1 buah)": (100, 1, 26, 0.3, "Real food"),
+    "Apel (1 buah)": (80, 0.5, 22, 0.2, "Real food"),
+    "Jeruk (1 buah)": (60, 1, 15, 0.2, "Real food"),
+    "Semangka (100g)": (30, 0.6, 7.5, 0.2, "Real food"),
+    "Yoghurt plain (1 cup)": (125, 10, 8, 6, "Real food"),
+    "Susu rendah lemak (1 gelas)": (120, 8, 12, 4, "Real food"),
+    "Kacang almond (20 gr)": (115, 4, 4, 10, "Real food"),
+    "Edamame rebus (100g)": (120, 11, 10, 5, "Real food"),
+    "Salad sayur (tanpa dressing)": (75, 2, 10, 1, "Real food"),
+    "Air putih": (0, 0, 0, 0, "Drink"),
+    "Teh tawar": (3, 0, 1, 0, "Drink"),
+    "Kopi hitam": (4, 0, 1, 0, "Drink"),
+    "Jus jeruk (1 gelas)": (110, 2, 26, 0.5, "Drink"),
+    "Jus apel (1 gelas)": (120, 1, 29, 0.5, "Drink"),
+    "Susu murni (1 gelas)": (150, 8, 12, 8, "Drink"),
+    "Soda (1 kaleng)": (150, 0, 39, 0, "Drink"),
+    "Bubble tea (1 gelas)": (400, 2, 70, 10, "Drink"),
+    "Frappuccino (1 gelas)": (500, 5, 80, 15, "Drink"),
+}
+
+for item_name, (calories, protein, carbs, fat, category) in LOCALIZED_NUTRITION_ITEMS.items():
+    NUTRITION_FOODS[item_name] = food_item_with_macros(
+        1,
+        calories,
+        protein,
+        carbs,
+        fat,
+        category=category,
+    )
+
 NUTRITION_DRINKS = {
     name: details
     for name, details in NUTRITION_FOODS.items()
@@ -1175,11 +1272,18 @@ def nutrition_totals(entries: list[dict]) -> dict:
     totals = {"calories": 0, "protein": 0.0, "carbs": 0.0, "fat": 0.0}
     for entry in entries:
         calories = float(entry["calories"])
-        protein_ratio, carbs_ratio, fat_ratio = MACRO_RATIOS.get(entry["category"], MACRO_RATIOS["Other"])
         totals["calories"] += calories
-        totals["protein"] += calories * protein_ratio / 4
-        totals["carbs"] += calories * carbs_ratio / 4
-        totals["fat"] += calories * fat_ratio / 9
+        if all(entry.get(macro) is not None for macro in ("protein", "carbs", "fat")):
+            totals["protein"] += float(entry["protein"])
+            totals["carbs"] += float(entry["carbs"])
+            totals["fat"] += float(entry["fat"])
+        else:
+            protein_ratio, carbs_ratio, fat_ratio = MACRO_RATIOS.get(
+                entry["category"], MACRO_RATIOS["Other"]
+            )
+            totals["protein"] += calories * protein_ratio / 4
+            totals["carbs"] += calories * carbs_ratio / 4
+            totals["fat"] += calories * fat_ratio / 9
     return totals
 
 
@@ -1237,6 +1341,9 @@ def initialize_database():
                 category TEXT NOT NULL,
                 servings REAL NOT NULL,
                 calories INTEGER NOT NULL,
+                protein REAL,
+                carbs REAL,
+                fat REAL,
                 FOREIGN KEY (username) REFERENCES profiles(username)
             );
             """
@@ -1264,6 +1371,33 @@ def initialize_database():
             connection.execute("UPDATE profiles SET email = username WHERE email IS NULL OR email = ''")
         ensure_profile_column("height", "REAL NOT NULL DEFAULT 0")
         ensure_profile_column("nutrition_commitment", "TEXT NOT NULL DEFAULT ''")
+        food_entry_columns = {
+            row["name"] for row in connection.execute("PRAGMA table_info(food_entries)").fetchall()
+        }
+        for column_name in ("protein", "carbs", "fat"):
+            if column_name not in food_entry_columns:
+                connection.execute(f"ALTER TABLE food_entries ADD COLUMN {column_name} REAL")
+        legacy_entries = connection.execute(
+            "SELECT id, name, servings FROM food_entries WHERE protein IS NULL"
+        ).fetchall()
+        for entry in legacy_entries:
+            details = NUTRITION_FOODS.get(entry["name"])
+            if details is None:
+                continue
+            servings = float(entry["servings"])
+            connection.execute(
+                """
+                UPDATE food_entries
+                SET protein = ?, carbs = ?, fat = ?
+                WHERE id = ?
+                """,
+                (
+                    details["protein"] * servings,
+                    details["carbs"] * servings,
+                    details["fat"] * servings,
+                    entry["id"],
+                ),
+            )
         demo = DEFAULT_PROFILES["demo"]
         connection.execute(
             """
@@ -1400,8 +1534,9 @@ def save_food_entry(username: str, entry: dict):
     with get_connection() as connection:
         connection.execute(
             """
-            INSERT INTO food_entries (username, date, name, category, servings, calories)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO food_entries
+                (username, date, name, category, servings, calories, protein, carbs, fat)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 username,
@@ -1410,6 +1545,9 @@ def save_food_entry(username: str, entry: dict):
                 entry["category"],
                 entry["servings"],
                 entry["calories"],
+                entry.get("protein"),
+                entry.get("carbs"),
+                entry.get("fat"),
             ),
         )
 
@@ -1418,7 +1556,7 @@ def get_food_entries(username: str):
     with get_connection() as connection:
         rows = connection.execute(
             """
-            SELECT date, name, category, servings, calories
+            SELECT date, name, category, servings, calories, protein, carbs, fat
             FROM food_entries
             WHERE username = ?
             ORDER BY date DESC, id DESC
@@ -2150,6 +2288,9 @@ with food_tab:
                         "Category": details["category"],
                         "Serving": f"{details['serving']} {details['unit']}",
                         "Calories (kcal)": details["calories"],
+                        "Protein (g)": details.get("protein", 0.0),
+                        "Carbs (g)": details.get("carbs", 0.0),
+                        "Fat (g)": details.get("fat", 0.0),
                     }
                     for name, details in matching_foods.items()
                 ]
@@ -2172,6 +2313,9 @@ with food_tab:
                 key=f"nutrition_{database_key}_selected_food",
             )
             selected_food = matching_foods[selected_food_name]
+            selected_food.setdefault("protein", 0.0)
+            selected_food.setdefault("carbs", 0.0)
+            selected_food.setdefault("fat", 0.0)
             serving_amount = st.number_input(
                 f"Serving ({selected_food['unit']})",
                 min_value=1.0,
@@ -2342,6 +2486,7 @@ with food_tab:
                 st.caption("Enter one food or drink directly, then choose the amount below.")
                 selected_macros = None
             else:
+                selected_macros = {"protein": 0.0, "carbs": 0.0, "fat": 0.0}
                 if selected_item == "Food":
                     food_search = st.text_input(
                         "Search individual foods",
@@ -2358,7 +2503,6 @@ with food_tab:
                         food_name = ""
                         calories_per_serving = 0
                         custom_category = "Food"
-                        selected_macros = None
                     else:
                         food_name = st.radio(
                             "Choose a food",
@@ -2394,6 +2538,7 @@ with food_tab:
                         st.warning("No drinks match that search. Try another name.")
                         food_name = ""
                         calories_per_serving = 0
+                        selected_macros = {"protein": 0.0, "carbs": 0.0, "fat": 0.0}
                     else:
                         drink_name = st.radio(
                             "Choose a drink from the list",
@@ -2442,6 +2587,21 @@ with food_tab:
                             "category": custom_category,
                             "servings": float(servings),
                             "calories": item_calories,
+                            "protein": (
+                                selected_macros["protein"] * servings
+                                if selected_macros is not None
+                                else None
+                            ),
+                            "carbs": (
+                                selected_macros["carbs"] * servings
+                                if selected_macros is not None
+                                else None
+                            ),
+                            "fat": (
+                                selected_macros["fat"] * servings
+                                if selected_macros is not None
+                                else None
+                            ),
                         },
                     )
                     st.success(f"Added {food_name}: {item_calories} kcal.")
