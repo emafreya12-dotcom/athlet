@@ -2466,7 +2466,7 @@ with food_tab:
                     st.session_state[tracker_type_key] = "Drinks"
                     st.rerun()
         selected_item = st.session_state[tracker_type_key]
-        with st.form("food_item_form"):
+        with st.container(key="food_item_form"):
             st.markdown(
                 '<div class="food-entry-panel"><div class="food-entry-kicker">Add nutrition</div><div class="food-entry-title">What are you adding today?</div>',
                 unsafe_allow_html=True,
@@ -2574,7 +2574,12 @@ with food_tab:
                 macro_columns[0].metric("Protein", f"{selected_macros['protein'] * servings:.1f} g")
                 macro_columns[1].metric("Carbs", f"{selected_macros['carbs'] * servings:.1f} g")
                 macro_columns[2].metric("Fat", f"{selected_macros['fat'] * servings:.1f} g")
-            add_food_item = st.form_submit_button("＋ Add to today's food")
+            add_food_item = st.button(
+                "＋ Add to today's food",
+                key=f"add_food_item_{username}",
+                type="primary",
+                use_container_width=True,
+            )
             if add_food_item:
                 if not food_name.strip():
                     st.warning("Choose a food or drink before adding it.")
