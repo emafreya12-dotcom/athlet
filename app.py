@@ -1123,7 +1123,7 @@ NUTRITION_FOODS.update(
 )
 
 
-LOCALIZED_NUTRITION_ITEMS = {
+CHAT_NUTRITION_ITEMS = {
     "Burger (1 porsi)": (310, 14, 28, 15, "Junk food"),
     "Pizza (1 slice)": (298, 12, 30, 14, "Junk food"),
     "Mie instan (1 bungkus)": (435, 8, 55, 18, "Junk food"),
@@ -1189,7 +1189,7 @@ LOCALIZED_NUTRITION_ITEMS = {
     "Frappuccino (1 gelas)": (500, 5, 80, 15, "Drink"),
 }
 
-for item_name, (calories, protein, carbs, fat, category) in LOCALIZED_NUTRITION_ITEMS.items():
+for item_name, (calories, protein, carbs, fat, category) in CHAT_NUTRITION_ITEMS.items():
     NUTRITION_FOODS[item_name] = food_item_with_macros(
         1,
         calories,
@@ -1197,6 +1197,104 @@ for item_name, (calories, protein, carbs, fat, category) in LOCALIZED_NUTRITION_
         carbs,
         fat,
         category=category,
+    )
+
+
+ADDITIONAL_NUTRITION_MACROS = {
+    "Nasi uduk": (375, 8, 45, 17),
+    "Nasi kuning": (325, 7, 50, 10),
+    "Bubur ayam": (325, 16, 45, 8),
+    "Ikan pepes": (200, 25, 4, 9),
+    "Ikan goreng": (250, 22, 8, 14),
+    "Sayur asem (1 bowl)": (75, 2, 12, 2),
+    "Gado-gado (1 serving)": (400, 12, 35, 22),
+    "Pecel (1 serving)": (400, 12, 35, 22),
+    "Capcay (1 serving)": (225, 10, 25, 9),
+    "Soto ayam (1 bowl)": (325, 22, 20, 16),
+    "Rawon (1 bowl)": (500, 28, 22, 32),
+    "Urap (1 serving)": (200, 6, 20, 11),
+    "Nasi putih": (130, 2.7, 28, 0.3),
+    "Nasi merah": (110, 2.6, 23, 0.9),
+    "Ayam bakar": (225, 27, 5, 11),
+    "Ayam panggang": (190, 29, 0, 7),
+    "Ayam rebus": (165, 31, 0, 3.6),
+    "Ikan bakar": (200, 25, 0, 10),
+    "Tempe": (195, 20, 8, 11),
+    "Tahu": (90, 10, 2, 5),
+    "Telur": (72, 6, 0.4, 5),
+    "Edamame": (120, 11, 10, 5),
+    "Sayur asem": (75, 2, 12, 2),
+    "Gado-gado": (400, 12, 35, 22),
+    "Pecel": (400, 12, 35, 22),
+    "Capcay": (225, 10, 25, 9),
+    "Soto ayam": (325, 22, 20, 16),
+    "Rawon": (500, 28, 22, 32),
+    "Urap": (200, 6, 20, 11),
+    "Kentang": (77, 2, 17.5, 0.1),
+    "Ubi": (100, 2, 23, 0.1),
+    "Singkong": (160, 1.4, 38, 0.3),
+    "Pisang": (89, 1.1, 22.8, 0.3),
+    "Pepaya": (43, 0.5, 11, 0.3),
+    "Mangga": (60, 0.8, 15, 0.4),
+    "Jambu": (68, 2.6, 14, 1),
+    "Rambutan": (68, 0.9, 16.5, 0.2),
+    "Salak": (80, 0.4, 20, 0.4),
+    "Nangka": (95, 1.7, 24, 0.6),
+    "Durian": (147, 1.5, 27, 5),
+}
+
+for item_name, (calories, protein, carbs, fat) in ADDITIONAL_NUTRITION_MACROS.items():
+    if item_name in NUTRITION_FOODS:
+        details = NUTRITION_FOODS[item_name]
+        details.update(calories=calories, protein=protein, carbs=carbs, fat=fat)
+
+
+fallback_macro_ratios = {
+    "Protein": (0.55, 0.05, 0.40),
+    "Seafood & meat": (0.45, 0.05, 0.50),
+    "Plant protein": (0.30, 0.30, 0.40),
+    "Eggs & dairy": (0.30, 0.20, 0.50),
+    "Carbohydrate & grains": (0.10, 0.80, 0.10),
+    "Fruit": (0.05, 0.90, 0.05),
+    "Vegetables": (0.15, 0.75, 0.10),
+    "Healthy fats": (0.05, 0.10, 0.85),
+    "Food limit": (0.10, 0.45, 0.45),
+    "Other": (0.15, 0.55, 0.30),
+}
+
+for details in NUTRITION_FOODS.values():
+    if details["category"] != "Drink" and not any(
+        details.get(macro, 0) for macro in ("protein", "carbs", "fat")
+    ):
+        protein_ratio, carbs_ratio, fat_ratio = fallback_macro_ratios.get(
+            details["category"], fallback_macro_ratios["Other"]
+        )
+        details["protein"] = details["calories"] * protein_ratio / 4
+        details["carbs"] = details["calories"] * carbs_ratio / 4
+        details["fat"] = details["calories"] * fat_ratio / 9
+
+
+ADDITIONAL_DRINK_NUTRITION = {
+    "Green tea": (250, 2, 0, 0, 0),
+    "Milk tea (250 ml)": (250, 120, 4, 18, 4),
+    "Whole milk (250 ml)": (250, 150, 8, 12, 8),
+    "Low-fat milk (250 ml)": (250, 120, 8, 12, 5),
+    "Kefir (250 ml)": (250, 140, 8, 12, 6),
+    "Protein shake (1 serving)": (300, 225, 30, 12, 5),
+    "Chocolate milk (300 ml)": (300, 220, 8, 32, 6),
+    "Orange juice (250 ml)": (250, 110, 2, 26, 0.5),
+    "Apple juice (250 ml)": (250, 120, 1, 29, 0.5),
+    "Soda (1 can)": (330, 150, 0, 39, 0),
+    "Bubble tea (1 cup)": (500, 400, 2, 70, 10),
+    "Frappuccino (1 cup)": (350, 500, 5, 80, 15),
+    "Electrolyte tablet drink (500 ml)": (500, 10, 0, 2, 0),
+    "Low-sugar electrolyte drink (500 ml)": (500, 40, 0, 10, 0),
+}
+
+for drink_name, (serving, calories, protein, carbs, fat) in ADDITIONAL_DRINK_NUTRITION.items():
+    NUTRITION_FOODS.setdefault(
+        drink_name,
+        drink_item(serving, calories, protein=protein, carbs=carbs, fat=fat),
     )
 
 NUTRITION_DRINKS = {
@@ -2477,6 +2575,30 @@ with food_tab:
                     "Calories per serving (kcal)", min_value=0, max_value=3000, step=5, value=200,
                     key=f"custom_food_calories_{username}",
                 )
+                custom_protein = st.number_input(
+                    "Protein per serving (g)",
+                    min_value=0.0,
+                    max_value=500.0,
+                    step=0.5,
+                    value=0.0,
+                    key=f"custom_food_protein_{username}",
+                )
+                custom_carbs = st.number_input(
+                    "Carbs per serving (g)",
+                    min_value=0.0,
+                    max_value=500.0,
+                    step=0.5,
+                    value=0.0,
+                    key=f"custom_food_carbs_{username}",
+                )
+                custom_fat = st.number_input(
+                    "Fat per serving (g)",
+                    min_value=0.0,
+                    max_value=300.0,
+                    step=0.5,
+                    value=0.0,
+                    key=f"custom_food_fat_{username}",
+                )
                 custom_category = st.selectbox(
                     "Item type",
                     ["Food", "Drink", "Other"],
@@ -2484,7 +2606,11 @@ with food_tab:
                 )
                 selected_item = custom_category
                 st.caption("Enter one food or drink directly, then choose the amount below.")
-                selected_macros = None
+                selected_macros = {
+                    "protein": custom_protein,
+                    "carbs": custom_carbs,
+                    "fat": custom_fat,
+                }
             else:
                 selected_macros = {"protein": 0.0, "carbs": 0.0, "fat": 0.0}
                 if selected_item == "Food":
